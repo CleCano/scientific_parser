@@ -1,4 +1,4 @@
-# scientific_parser
+# scientific_parser : Sprint 2
 
 ## Explication du système :
 
