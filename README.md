@@ -15,5 +15,5 @@ Dans un premier temps les fichiers PDF seront convertis à l'aide de la commande
 
 ## Dépendances :
 
-### *Python3 
-### *pdftotext
+### Python3 
+### pdftotext
