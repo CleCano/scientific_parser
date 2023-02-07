@@ -15,5 +15,5 @@ Dans un premier temps les fichiers PDF seront convertis à l'aide de la commande
 
 ## Dépendances :
 
-### Python3 
-### pdftotext
+### ```python3``` pour exécuter l'application 
+### La commande ```pdftotext``` pour la conversion du pdf en plain text
