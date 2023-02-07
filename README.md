@@ -11,3 +11,9 @@ Dans un premier temps les fichiers PDF seront convertis à l'aide de la commande
 ## Comment utiliser le logiciel :
 
 .................
+
+
+## Dépendances :
+
+### *Python3 
+### *pdftotext
