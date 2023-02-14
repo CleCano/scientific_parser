@@ -18,15 +18,15 @@ def extract_pdf_info(file_path):
         # Use regular expressions to extract the title, authors, and abstract
         title_regex = re.compile(r"Title:\s*(.*)")
         authors_regex = re.compile(r"Author\(s\):\s*(.*)")
-        abstract_regex = re.compile(r"Abstract\s*(.*)")
+        abstract_regex = re.compile(r"Abstract((?:.|\n)*?)\n[1-9I]\.?\s+(?:INTRODUCTION|Introduction)")
         title_match = re.search(title_regex, text)
         title = title_match.group(1).strip() if title_match else ""
         authors_match = re.search(authors_regex, text)
         authors = authors_match.group(1).strip() if authors_match else ""
-        abstract_match = re.search(abstract_regex, text)
-        abstract = abstract_match.group(1).strip() if abstract_match else ""
+        abstract_match = re.findall(abstract_regex, text)
+        abstract = abstract_match.pop() if abstract_match else ""
 
-    return (os.path.basename(file_path), title, authors, abstract)
+    return (os.path.basename(file_path), title, authors, abstract,text)
 
 def extract_pdf_info_from_directory(directory):
     """
@@ -43,5 +43,7 @@ def extract_pdf_info_from_directory(directory):
 
 directory = '../Corpus_2022/Corpus_2021/'
 results = extract_pdf_info_from_directory(directory)
+
 for i in range(len(results)):
-    print("Nom du fichier :",results[i][0],"\n Le titre de l'article :", results[i][1],"\n Les auteurs :", results[i][2],"\n Le résumé :", results[i][3],end="\n----------------------------------\n")
+    #print("text :"+results[i][4])
+    print("Nom du fichier :",results[i][0],"\nLe titre de l'article :", results[i][1],"\nLes auteurs :", results[i][2],"\nLe résumé :", results[i][3],end="\n----------------------------------\n")
