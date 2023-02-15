@@ -1,1 +1,2 @@
-Captures d'écran diverses :
+## Captures d'écran diverses :
+<picture>
