@@ -1,2 +1,2 @@
 ## Captures d'écran diverses :
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]https://github.com/CleCano/scientific_parser_IUTEAM/blob/sprint2_parser/Artefacts/constructionRegex.png?raw=true)
+![alt text](https://github.com/CleCano/scientific_parser_IUTEAM/blob/sprint2_parser/Artefacts/constructionRegex.png?raw=true)
