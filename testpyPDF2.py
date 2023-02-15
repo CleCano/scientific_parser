@@ -18,7 +18,7 @@ def extract_pdf_info(file_path):
         # Use regular expressions to extract the title, authors, and abstract
         title_regex = re.compile(r"Title:\s*(.*)")
         authors_regex = re.compile(r"Author\(s\):\s*(.*)")
-        abstract_regex = re.compile(r"Abstract((?:.|\n)*?)\n[1-9I]\.?\s+(?:INTRODUCTION|Introduction)")
+        abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
         title_match = re.search(title_regex, text)
         title = title_match.group(1).strip() if title_match else ""
         authors_match = re.search(authors_regex, text)
