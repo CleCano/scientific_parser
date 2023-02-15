@@ -1,14 +1,19 @@
 #!/usr/bin/python3
 
-
 from tkinter import *
 from tkinter import filedialog
 
 def file_open():
-	path = filedialog.askopenfilename(initialdir='~')
-	fh = open(path, 'r')
-	read = fh.read()
-	textarea.insert(END,read)
+   path = filedialog.askopenfilename(initialdir='~')
+   op = open(path, 'r')
+   read = op.read()
+   maj =  read.upper()
+   textarea.insert(END,maj)
+
+   savePath = filedialog.askopenfilename(initialdir='~')
+   wr = open(savePath, 'w')
+   wr.write(maj)
+
 	
 window = Tk()
 
