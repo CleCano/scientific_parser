@@ -15,5 +15,18 @@ Dans un premier temps les fichiers PDF seront convertis à l'aide de la commande
 
 ## Dépendances :
 
-### ```python3``` pour exécuter l'application 
-### La commande ```pdftotext``` pour la conversion du pdf en plain text
+### ```python3``` pour exécuter l'application. 
+`sudo apt-get install python3`
+`sudo apt-get install python3-pip`
+
+---
+### La librairie ```PyPdf2``` pour la conversion du pdf en texte.
+
+`pip install PyPDF2`
+
+---
+### La librairie ```tkinter``` pour l'interface graphique de l'application.
+
+` sudo apt-get install python3-tk`
+
+---
