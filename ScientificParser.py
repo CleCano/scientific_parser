@@ -64,7 +64,7 @@ def extract_pdf_info_from_directory(directory):
     return results
 
 def main(args):
-    print(args[])
+    print(args)
 
 if __name__ == "__main__":
     import argparse
