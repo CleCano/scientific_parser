@@ -64,14 +64,15 @@ def extract_pdf_info_from_directory(directory):
     return results
 
 def main(args):
-    print(args)
+    print(args[])
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Parseur d'articles scientifiques")
-    parser.add_argument('-t',action='store_true',help='Sortie des informations en .txt')
-    parser.add_argument('-x',action='store_true',help='Sortie des informations en .xml')
-    parser.add_argument('filename',help='Fichier pdf à convertir')
+    parser.add_argument('-t',action='store_true',help='To be set if the output should be saved in a .txt')
+    parser.add_argument('-x',action='store_true',help='To be set if the output should be saved in a .xml')
+    parser.add_argument('filename',help='The path to the file that needs to be converted')
+    parser.add_argument('--out',help='Optionnal path to the directory where the output should be saved')
     args = parser.parse_args()
     main(args)
