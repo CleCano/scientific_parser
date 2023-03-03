@@ -63,9 +63,15 @@ def extract_pdf_info_from_directory(directory):
             results.append(info)
     return results
 
-directory = '../Corpus_2022/Corpus_2021/'
-results = extract_pdf_info_from_directory(directory)
+def main(args):
+    print(args)
 
-for i in range(len(results)):
-    #print("text :"+results[i][4])
-    print("Nom du fichier :",results[i][0],"\nLe titre de l'article :", results[i][1],"\nLes auteurs :", results[i][2],"\nLe résumé :", results[i][3],end="\n----------------------------------\n")
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Parseur d'articles scientifiques")
+    parser.add_argument('-t',action='store_true',help='Sortie des informations en .txt')
+    parser.add_argument('-x',action='store_true',help='Sortie des informations en .xml')
+    parser.add_argument('filename',help='Fichier pdf à convertir')
+    args = parser.parse_args()
+    main(args)
