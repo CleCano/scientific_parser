@@ -29,11 +29,13 @@ def getAbstract(pdf):
 
     text = pdf.pages[0].extract_text()
 
-    abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
+    abstract_regex = re.compile(r"(Abstract ?.?\.? ?)|(In this article|This article presents)((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
     abstract_match = re.findall(abstract_regex, text)
     abstract = abstract_match.pop() if abstract_match else ""
-
-    return abstract
+    finalAbstract=""
+    for i in abstract:
+        finalAbstract+=i
+    return finalAbstract.replace('-\n','')
 
 def extract_pdf_info(file_path):
     """
@@ -84,7 +86,8 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     outputString = "Nom du fichier : "+file_name+"\n"
     outputString+="Titre de l'article : "+getTitle(metadata,text)+"\n"
     outputString+="Auteurs : "+"\n"
-    outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
+    print(getAbstract(pdf))
+    #outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
     outputString+="Bibliographie : "
     if(output_file_name!=""):
         fd = os.open(output_file_name,flags=os.O_RDWR)
