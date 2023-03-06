@@ -1,0 +1,716 @@
+Summary Evaluation
+with and without References
+Juan-Manuel Torres-Moreno, Horacio Saggion, Iria da Cunha, Eric SanJuan, and Patricia Vel ´azquez-Morales
+Abstract —We study a new content-based method for
+the evaluation of text summarization systems without
+human models which is used to produce system rankings.
+The research is carried out using a new content-based
+evaluation framework called FRESA to compute a variety of
+divergences among probability distributions. We apply our
+comparison framework to various well-established content-based
+evaluation measures in text summarization such as COVERAGE ,
+RESPONSIVENESS ,PYRAMIDS and ROUGE studying their
+associations in various text summarization tasks including
+generic multi-document summarization in English and French,
+focus-based multi-document summarization in English and
+generic single-document summarization in French and Spanish.
+Index Terms —Text summarization evaluation, content-based
+evaluation measures, divergences.
+I. I NTRODUCTION
+TEXT summarization evaluation has always been a
+complex and controversial issue in computational
+linguistics. In the last decade, signiﬁcant advances have been
+made in this ﬁeld as well as various evaluation measures have
+been designed. Two evaluation campaigns have been led by
+the U.S. agence DARPA. The ﬁrst one, SUMMAC, ran from
+1996 to 1998 under the auspices of the Tipster program [1],
+and the second one, entitled DUC (Document Understanding
+Conference) [2], was the main evaluation forum from 2000
+until 2007. Nowadays, the Text Analysis Conference (TAC)
+[3] provides a forum for assessment of different information
+access technologies including text summarization.
+Evaluation in text summarization can be extrinsic or
+intrinsic [4]. In an extrinsic evaluation, the summaries are
+assessed in the context of an speciﬁc task carried out by a
+human or a machine. In an intrinsic evaluation, the summaries
+are evaluated in reference to some ideal model. SUMMAC
+was mainly extrinsic while DUC and TAC followed an
+intrinsic evaluation paradigm. In an intrinsic evaluation, an
+Manuscript received June 8, 2010. Manuscript accepted for publication July
+25, 2010.
+Juan-Manuel Torres-Moreno is with LIA/Universit ´e d’Avignon,
+France and ´Ecole Polytechnique de Montr ´eal, Canada
+(juan-manuel.torres@univ-avignon.fr).
+Eric SanJuan is with LIA/Universit ´e d’Avignon, France
+(eric.sanjuan@univ-avignon.fr).
+Horacio Saggion is with DTIC/Universitat Pompeu Fabra, Spain
+(horacio.saggion@upf.edu).
+Iria da Cunha is with IULA/Universitat Pompeu Fabra, Spain;
+LIA/Universit ´e d’Avignon, France and Instituto de Ingenier ´ıa/UNAM, Mexico
+(iria.dacunha@upf.edu).
+Patricia Vel ´azquez-Morales is with VM Labs, France
+(patricia velazquez@yahoo.com).automatically generated summary ( peer) has to be compared
+with one or more reference summaries ( models ). DUC used
+an interface called SEE to allow human judges to compare
+apeer with a model . Thus, judges give a C OVERAGE score
+to each peer produced by a system and the ﬁnal system
+COVERAGE score is the average of the C OVERAGE ’s scores
+asigned. These system’s C OVERAGE scores can then be used
+to rank summarization systems. In the case of query-focused
+summarization (e.g. when the summary should answer a
+question or series of questions) a R ESPONSIVENESS score
+is also assigned to each summary, which indicates how
+responsive the summary is to the question(s).
+Because manual comparison of peer summaries with model
+summaries is an arduous and costly process, a body of
+research has been produced in the last decade on automatic
+content-based evaluation procedures. Early studies used text
+similarity measures such as cosine similarity (with or without
+weighting schema) to compare peer and model summaries
+[5]. Various vocabulary overlap measures such as n-grams
+overlap or longest common subsequence between peer and
+model have also been proposed [6], [7]. The B LEU machine
+translation evaluation measure [8] has also been tested in
+summarization [9]. The DUC conferences adopted the R OUGE
+package for content-based evaluation [10]. R OUGE implements
+a series of recall measures based on n-gram co-occurrence
+between a peer summary and a set of model summaries. These
+measures are used to produce systems’ rank. It has been shown
+that system rankings, produced by some R OUGE measures
+(e.g., R OUGE -2, which uses 2-grams), have a correlation with
+rankings produced using C OVERAGE .
+In recent years the P YRAMIDS evaluation method [11] has
+been introduced. It is based on the distribution of “content”
+of a set of model summaries. Summary Content Units (SCUs)
+are ﬁrst identiﬁed in the model summaries, then each SCU
+receives a weight which is the number of models containing
+or expressing the same unit. Peer SCUs are identiﬁed in the
+peer, matched against model SCUs, and weighted accordingly.
+The P YRAMIDS score given to a peer is the ratio of the sum
+of the weights of its units and the sum of the weights of the
+best possible ideal summary with the same number of SCUs as
+the peer. The P YRAMIDS scores can be also used for ranking
+summarization systems. [11] showed that P YRAMIDS scores
+produced reliable system rankings when multiple (4 or more)
+models were used and that P YRAMIDS rankings correlate with
+rankings produced by R OUGE -2 and R OUGE -SU2 (i.e. R OUGE
+with skip 2-grams). However, this method requires the creation
+13
+Polibits (42) 2010of models and the identiﬁcation, matching, and weighting of
+SCUs in both: models and peers.
+[12] evaluated the effectiveness of the Jensen-Shannon
+(JS) [13] theoretic measure in predicting systems ranks
+in two summarization tasks: query-focused and update
+summarization. They have shown that ranks produced
+by P YRAMIDS and those produced by JS measure
+correlate. However, they did not investigate the effect
+of the measure in summarization tasks such as generic
+multi-document summarization (DUC 2004 Task 2),
+biographical summarization (DUC 2004 Task 5), opinion
+summarization (TAC 2008 OS), and summarization in
+languages other than English.
+In this paper we present a series of experiments aimed at
+a better understanding of the value of the JS divergence
+for ranking summarization systems. We have carried out
+experimentation with the proposed measure and we have
+veriﬁed that in certain tasks (such as those studied by
+[12]) there is a strong correlation among P YRAMIDS ,
+RESPONSIVENESS and theJS divergence, but as we will
+show in this paper, there are datasets in which the correlation
+is not so strong. We also present experiments in Spanish
+and French showing positive correlation between the JS
+and R OUGE which is the de facto evaluation measure used
+in evaluation of non-English summarization. To the best of
+our knowledge this is the more extensive set of experiments
+interpreting the value of evaluation without human models.
+The rest of the paper is organized in the following way:
+First in Section II we introduce related work in the area of
+content-based evaluation identifying the departing point for
+our inquiry; then in Section III we explain the methodology
+adopted in our work and the tools and resources used for
+experimentation. In Section IV we present the experiments
+carried out together with the results. Section V discusses the
+results and Section VI concludes the paper and identiﬁes future
+work.
+II. R ELATED WORK
+One of the ﬁrst works to use content-based measures in
+text summarization evaluation is due to [5], who presented an
+evaluation framework to compare rankings of summarization
+systems produced by recall and cosine-based measures. They
+showed that there was weak correlation among rankings
+produced by recall, but that content-based measures produce
+rankings which were strongly correlated. This put forward
+the idea of using directly the full document for comparison
+purposes in text summarization evaluation. [6] presented a
+set of evaluation measures based on the notion of vocabulary
+overlap including n-gram overlap, cosine similarity, and
+longest common subsequence, and they applied them to
+multi-document summarization in English and Chinese.
+However, they did not evaluate the performance of the
+measures in different summarization tasks. [7] also compared
+various evaluation measures based on vocabulary overlap.
+Although these measures were able to separate random fromnon-random systems, no clear conclusion was reached on the
+value of each of the studied measures.
+Nowadays, a widespread summarization evaluation
+framework is R OUGE [14], which offers a set of statistics
+that compare peer summaries with models. It counts
+co-occurrences of n-grams in peer and models to derive a
+score. There are several statistics depending on the used
+n-grams and the text processing applied to the input texts
+(e.g., lemmatization, stop-word removal).
+[15] proposed a method of evaluation based on the
+use of “distances” or divergences between two probability
+distributions (the distribution of units in the automatic
+summary and the distribution of units in the model
+summary). They studied two different Information Theoretic
+measures of divergence: the Kullback-Leibler ( KL) [16] and
+Jensen-Shannon (JS) [13] divergences. KL computes the
+divergence between probability distributions PandQin the
+following way:
+DKL(PjjQ) =1
+2X
+wPwlog2Pw
+Qw(1)
+WhileJS divergence is deﬁned as follows:
+DJS(PjjQ) =1
+2X
+wPwlog22Pw
+Pw+Qw+Qwlog22Qw
+Pw+Qw
+(2)
+These measures can be applied to the distribution of units in
+system summaries Pand reference summaries Q. The value
+obtained may be used as a score for the system summary. The
+method has been tested by [15] over the DUC 2002 corpus for
+single and multi-document summarization tasks showing good
+correlation among divergence measures and both coverage and
+ROUGE rankings.
+[12] went even further and, as in [5], they proposed to
+compare directly the distribution of words in full documents
+with the distribution of words in automatic summaries to
+derive a content-based evaluation measure. They found a
+high correlation between rankings produced using models
+and rankings produced without models. This last work is the
+departing point for our inquiry into the value of measures that
+do not rely on human models.
+III. M ETHODOLOGY
+The followed methodology in this paper mirrors the one
+adopted in past work (e.g. [5], [7], [12]). Given a particular
+summarization task T,pdata points to be summarized
+with input material fIigp 1
+i=0(e.g. document(s), question(s),
+topic(s)),speer summariesfSUMi;kgs 1
+k=0for inputi, and
+mmodel summaries fMODELi;jgm 1
+j=0for inputi, we will
+compare rankings of the speer summaries produced by various
+evaluation measures. Some measures that we use compare
+summaries with nof themmodels:
+MEASURE M(SUMi;k;fMODELi;jgn 1
+j=0) (3)
+Juan-Manuel Torres-Moreno, Horacio Saggion, Iria da Cunha, Eric SanJuan, and Patricia Velázquez-Morales
+14
+Polibits (42) 2010while other measures compare peers with all or some of the
+input material:
+MEASURE M(SUMi;k;I0
+i) (4)
+whereI0
+iis some subset of input Ii. The values produced
+by the measures for each summary SUM i;kare averaged
+for each system k= 0;:::;s 1and these averages are
+used to produce a ranking. Rankings are then compared
+using Spearman Rank correlation [17] which is used to
+measure the degree of association between two variables
+whose values are used to rank objects. We have chosen
+to use this correlation to compare directly results to those
+presented in [12]. Computation of correlations is done using
+theStatistics-RankCorrelation-0.12 package1, which computes
+the rank correlation between two vectors. We also veriﬁed
+the good conformity of the results with the correlation test
+of Kendallcalculated with the statistical software R. The
+two nonparametric tests of Spearman and Kendall do not
+really stand out as the treatment of ex-æquo. The good
+correspondence between the two tests shows that they do not
+introduce bias in our analysis. Subsequently will mention only
+theof Sperman more widely used in this ﬁeld.
+A. Tools
+We carry out experimentation using a new summarization
+evaluation framework: F RESA –FRamework for Evaluating
+Summaries Automatically–, which includes document-based
+summary evaluation measures based on probabilities
+distribution2. As in the R OUGE package, F RESA supports
+differentn-grams and skip n-grams probability distributions.
+The F RESA environment can be used in the evaluation of
+summaries in English, French, Spanish and Catalan, and it
+integrates ﬁltering and lemmatization in the treatment of
+summaries and documents. It is developed in Perl and will
+be made publicly available. We also use the R OUGE package
+[10] to compute various R OUGE statistics in new datasets.
+B. Summarization Tasks and Data Sets
+We have conducted our experimentation with the following
+summarization tasks and data sets:
+1) Generic multi-document-summarization in English
+(production of a short summary of a cluster of related
+documents) using data from DUC’043, task 2: 50
+clusters, 10 documents each – 294,636 words.
+2) Focused-based summarization in English (production of
+a short focused multi-document summary focused on the
+question “who is X?”, where X is a person’s name) using
+data from the DUC’04 task 5: 50 clusters, 10 documents
+each plus a target person name – 284,440 words.
+1http://search.cpan.org/ gene/Statistics-RankCorrelation-0.12/
+2FRESA is available at: http://lia.univavignon.fr/ﬁleadmin/axes/TALNE/
+Ressources.html
+3http://www-nlpir.nist.gov/projects/duc/guidelines/2004.html3) Update-summarization task that consists of creating a
+summary out of a cluster of documents and a topic. Two
+sub-tasks are considered here: A) an initial summary has
+to be produced based on an initial set of documents and
+topic; B) an update summary has to be produced from
+a different (but related) cluster assuming documents
+used in A) are known. The English TAC’08 Update
+Summarization dataset is used, which consists of 48
+topics with 20 documents each – 36,911 words.
+4) Opinion summarization where systems have to analyze
+a set of blog articles and summarize the opinions
+about a target in the articles. The TAC’08 Opinion
+Summarization in English4data set (taken from the
+Blogs06 Text Collection) is used: 25 clusters and targets
+(i.e., target entity and questions) were used – 1,167,735
+words.
+5) Generic single-document summarization in Spanish
+using the Medicina Cl ´ınica5corpus, which is composed
+of 50 medical articles in Spanish, each one with its
+corresponding author abstract – 124,929 words.
+6) Generic single document summarization in French using
+the “Canadien French Sociological Articles” corpus
+from the journal Perspectives interdisciplinaires sur le
+travail et la sant ´e(PISTES)6. It contains 50 sociological
+articles in French, each one with its corresponding
+author abstract – 381,039 words.
+7) Generic multi-document-summarization in French using
+data from the RPM27corpus [18], 20 different themes
+consisting of 10 articles and 4 abstracts by reference
+thematic – 185,223 words.
+For experimentation in the TAC and the DUC datasets we use
+directly the peer summaries produced by systems participating
+in the evaluations. For experimentation in Spanish and French
+(single and multi-document summarization) we have created
+summaries at a similar ratio to those of reference using the
+following systems:
+–ENERTEX [19], a summarizer based on a theory of
+textual energy;
+–CORTEX [20], a single-document sentence extraction
+system for Spanish and French that combines various
+statistical measures of relevance (angle between sentence
+and topic, various Hamming weights for sentences, etc.)
+and applies an optimal decision algorithm for sentence
+selection;
+–SUMMTERM [21], a terminology-based summarizer that
+is used for summarization of medical articles and
+uses specialized terminology for scoring and ranking
+sentences;
+–REG [22], summarization system based on an greedy
+algorithm;
+4http://www.nist.gov/tac/data/index.html
+5http://www.elsevier.es/revistas/ctl servlet? f=7032&revistaid=2
+6http://www.pistes.uqam.ca/
+7http://www-labs.sinequa.com/rpm2
+Summary Evaluation with and without References
+15
+Polibits (42) 2010–JSsummarizer, a summarization system that scores
+and ranks sentences according to their Jensen-Shannon
+divergence to the source document;
+– a lead-based summarization system that selects the lead
+sentences of the document;
+– a random-based summarization system that selects
+sentences at random;
+–Open Text Summarizer [23], a multi-lingual summarizer
+based on the frequency and
+– commercial systems: Word ,SSSummarizer8,Pertinence9
+andCopernic10.
+C. Evaluation Measures
+The following measures derived from human assessment of
+the content of the summaries are used in our experiments:
+– C OVERAGE is understood as the degree to which one
+peer summary conveys the same information as a model
+summary [2]. C OVERAGE was used in DUC evaluations.
+This measure is used as indicated in equation 3 using
+human references or models.
+– R ESPONSIVENESS ranks summaries in a 5-point scale
+indicating how well the summary satisﬁed a given
+information need [2]. It is used in focused-based
+summarization tasks. This measure is used as indicated
+in equation 4 since a human judges the summary
+with respect to a given input “user need” (e.g., a
+question). R ESPONSIVENESS was used in DUC and TAC
+evaluations.
+– P YRAMIDS [11] is a content assessment measure which
+compares content units in a peer summary to weighted
+content units in a set of model summaries. This
+measure is used as indicated in equation 3 using human
+references or models. P YRAMIDS is the adopted metric
+for content-based evaluation in the TAC evaluations.
+For DUC and TAC datasets the values of these measures are
+available and we used them directly. We used the following
+automatic evaluation measures in our experiments:
+– R OUGE [14], which is a recall metric that takes into
+accountn-grams as units of content for comparing peer
+and model summaries. The R OUGE formula speciﬁed in
+[10] is as follows:
+ROUGE-n(R;M) =P
+m2MP
+n gram2Pcountmatch(n gram)
+P
+m2MPcount(n-gram)(5)
+where R is the summary to be evaluated, Mis the set of
+model (human) summaries, countmatchis the number of
+commonn-grams inmandP, and count is the number
+ofn-grams in the model summaries. For the experiments
+8http://www.kryltech.com/summarizer.htm
+9http://www.pertinence.net
+10http://www.copernic.com/en/products/summarizerpresented here we used uni-grams, 2-grams, and the skip
+2-grams with maximum skip distance of 4 (R OUGE -1,
+ROUGE -2 and R OUGE -SU4). R OUGE is used to compare
+a peer summary to a set of model summaries in our
+framework (as indicated in equation 3).
+– Jensen-Shannon divergence formula given in Equation 2
+is implemented in our F RESA package with the following
+speciﬁcation (Equation 6) for the probability distribution
+of wordsw.
+Pw=CT
+w
+N
+Qw=(CS
+w
+NSifw2S
+CT
+w+
+N+Botherwise(6)
+WherePis the probability distribution of words win
+textTandQis the probability distribution of words w
+in summary S;Nis the number of words in text and
+summaryN=NT+NS,B= 1:5jVj,CT
+wis the number
+of words in the text and CS
+wis the number of words in
+the summary. For smoothing the summary’s probabilities
+we have used = 0:005. We have also implemented
+other smoothing approaches (e.g. Good-Turing [24], that
+uses the CPAN Perl’s Statistics-Smoothing-SGT-2.1.2
+package11) in F RESA , but we do not use them in
+the experiments reported here. Following the R OUGE
+approach, in addition to word uni-grams we use 2-grams
+and skipn-grams computing divergences such as JS
+(using uni-grams) JS 2(using 2-grams),JS 4(using the
+skipn-grams of R OUGE -SU4), andJSMwhich is an
+average of theJSi.JSs measures are used to compare a
+peer summary to its source document(s) in our framework
+(as indicated in equation 4). In the case of summarization
+of multiple documents, these are concatenated (in the
+given input order) to form a single input from which
+probabilities are computed.
+IV. E XPERIMENTS AND RESULTS
+We ﬁrst replicated the experiments presented in [12] to
+verify that our implementation of JS produced correlation
+results compatible with that work. We used the TAC’08
+Update Summarization data set and computed JS and
+ROUGE measures for each peer summary. We produced
+two system rankings (one for each measure), which were
+compared to rankings produced using the manual P YRAMIDS
+and R ESPONSIVENESS scores. Spearman correlations were
+computed among the different rankings. The results are
+presented in Table I. These results conﬁrm a high correlation
+among P YRAMIDS , R ESPONSIVENESS andJS. We also
+veriﬁed high correlation between JS and R OUGE -2 (0:83
+Spearman correlation, not shown in the table) in this task and
+dataset.
+Then, we experimented with data from DUC’04, TAC’08
+Opinion Summarization pilot task as well as single and
+11http://search.cpan.org/ bjoernw/Statistics-Smoothing-SGT-2.1.2/
+Juan-Manuel Torres-Moreno, Horacio Saggion, Iria da Cunha, Eric SanJuan, and Patricia Velázquez-Morales
+16
+Polibits (42) 2010TABLE I
+SPEARMAN CORRELATION OF CONTENT -BASED MEASURES IN TAC’08
+UPDATE SUMMARIZATION TASK
+Mesure PYRAMIDS p-value RESPONSIVENESS p-value
+ROUGE -2 0.96p<0:005 0.92 p<0:005
+JS 0.85p<0:005 0.74 p<0:005
+multi-document summarization in Spanish and French. In spite
+of the fact that the experiments for French and Spanish corpora
+use less data points (i.e., less summarizers per task) than
+for English, results are still quite signiﬁcant. For DUC’04,
+we computed the JS measure for each peer summary in
+tasks 2 and 5 and we used JS, ROUGE , COVERAGE and
+RESPONSIVENESS scores to produce systems’ rankings. The
+various Spearman’s rank correlation values for DUC’04 are
+presented in Tables II (for task 2) and III (for task 5).
+For task 2, we have veriﬁed a strong correlation between
+JS and C OVERAGE . For task 5, the correlation between
+JS and C OVERAGE is weak, and that between JS and
+RESPONSIVENESS is weak and negative.
+Although the Opinion Summarization (OS) task is a new
+type of summarization task and its evaluation is a complicated
+issue, we have decided to compare JS rankings with those
+obtained using P YRAMIDS and R ESPONSIVENESS in TAC’08.
+Spearman’s correlation values are listed in Table IV. As it can
+be seen, there is weak and negative correlation of JS with
+both P YRAMIDS and R ESPONSIVENESS . Correlation between
+PYRAMIDS and R ESPONSIVENESS rankings is high for this
+task (0.71 Spearman’s correlation value).
+For experimentation in mono-document summarization
+in Spanish and French, we have run 11 multi-lingual
+summarization systems; for experimentation in French, we
+have run 12 systems. In both cases, we have produced
+summaries at a compression rate close to the compression rate
+of the authors’ provided abstracts. We have then computed JS
+and R OUGE measures for each summary and we have averaged
+the measure’s values for each system. These averages were
+used to produce rankings per each measure. We computed
+Spearman’s correlations for all pairs of rankings.
+Results are presented in Tables V, VI and VII. All results
+show medium to strong correlation between the JSmeasures
+and R OUGE measures. However the JS measure based on
+uni-grams has lower correlation than JSs which use n-grams
+of higher order. Note that table VII presents results for
+generic multi-document summarization in French, in this
+case correlation scores are lower than correlation scores for
+single-document summarization in French, a result which may
+be expected given the diversity of input in multi-document
+summarization.
+V. D ISCUSSION
+The departing point for our inquiry into text summarization
+evaluation has been recent work on the use of content-basedevaluation metrics that do not rely on human models but that
+compare summary content to input content directly [12]. We
+have some positive and some negative results regarding the
+direct use of the full document in content-based evaluation.
+We have veriﬁed that in both generic muti-document
+summarization and in topic-based multi-document
+summarization in English correlation among measures
+that use human models (P YRAMIDS , R ESPONSIVENESS
+and R OUGE ) and a measure that does not use models
+(JS divergence) is strong. We have found that correlation
+among the same measures is weak for summarization of
+biographical information and summarization of opinions in
+blogs. We believe that in these cases content-based measures
+should be considered, in addition to the input document, the
+summarization task (i.e. text-based representation, description)
+to better assess the content of the peers [25], the task being a
+determinant factor in the selection of content for the summary.
+Our multi-lingual experiments in generic single-document
+summarization conﬁrm a strong correlation among the
+JS divergence and R OUGE measures. It is worth noting
+that R OUGE is in general the chosen framework for
+presenting content-based evaluation results in non-English
+summarization.
+For the experiments in Spanish, we are conscious that we
+only have one model summary to compare with the peers.
+Nevertheless, these models are the corresponding abstracts
+written by the authors. As the experiments in [26] show, the
+professionals of a specialized domain (as, for example, the
+medical domain) adopt similar strategies to summarize their
+texts and they tend to choose roughly the same content chunks
+for their summaries. Previous studies have shown that author
+abstracts are able to reformulate content with ﬁdelity [27] and
+these abstracts are ideal candidates for comparison purposes.
+Because of this, the summary of the author of a medical article
+can be taken as reference for summaries evaluation. It is worth
+noting that there is still debate on the number of models to be
+used in summarization evaluation [28]. In the French corpus
+PISTES, we suspect the situation is similar to the Spanish
+case.
+VI. C ONCLUSIONS AND FUTURE WORK
+This paper has presented a series of experiments in
+content-based measures that do not rely on the use of model
+summaries for comparison purposes. We have carried out
+extensive experimentation with different summarization tasks
+drawing a clearer picture of tasks where the measures could
+be applied. This paper makes the following contributions:
+– We have shown that if we are only interested in ranking
+summarization systems according to the content of their
+automatic summaries, there are tasks were models could
+be subtituted by the full document in the computation of
+theJS measure obtaining reliable rankings. However,
+we have also found that the substitution of models
+by full-documents is not always advisable. We have
+Summary Evaluation with and without References
+17
+Polibits (42) 2010TABLE II
+SPEARMANOF CONTENT -BASED MEASURES WITH COVERAGE IN DUC’04 T ASK 2
+Mesure COVERAGE p-value
+ROUGE -2 0.79p<0:0050
+JS 0.68p<0:0025
+TABLE III
+SPEARMANOF CONTENT -BASED MEASURES IN DUC’04 T ASK 5
+Mesure COVERAGE p-value RESPONSIVENESS p-value
+ROUGE -2 0.78p<0:001 0.44 p<0:05
+JS 0.40p<0:050 -0.18 p<0:25
+TABLE IV
+SPEARMANOF CONTENT -BASED MEASURES IN TAC’08 OS TASK
+Mesure PYRAMIDS p-value RESPONSIVENESS p-value
+JS -0.13p<0:25 -0.14 p<0:25
+TABLE V
+SPEARMANOF CONTENT -BASED MEASURES WITH ROUGE IN THE Medicina Cl ´ınica CORPUS (SPANISH )
+Mesure ROUGE -1p-value ROUGE -2p-value ROUGE -SU4p-value
+JS 0.56p<0:100 0.46p<0:100 0.45p<0:200
+JS2 0.88p<0:001 0.80p<0:002 0.81p<0:005
+JS4 0.88p<0:001 0.80p<0:002 0.81p<0:005
+JSM 0.82p<0:005 0.71p<0:020 0.71p<0:010
+found weak correlation among different rankings in
+complex summarization tasks such as the summarization
+of biographical information and the summarization of
+opinions.
+– We have also carried out large-scale experiments in
+Spanish and French which show positive medium to
+strong correlation among system’s ranks produced by
+ROUGE and divergence measures that do not use the
+model summaries.
+– We have also presented a new framework, F RESA , for
+the computation of measures based on JS divergence.
+Following the R OUGE approach, F RESA package use
+word uni-grams, 2-grams and skip n-grams computing
+divergences. This framework will be available to the
+community for research purposes.
+Although we have made a number of contributions, this paper
+leaves many open questions than need to be addressed. In
+order to verify correlation between R OUGE andJS, in the
+short term we intend to extend our investigation to other
+languages such as Portuguese and Chinesse for which we
+have access to data and summarization technology. We also
+plan to apply F RESA to the rest of the DUC and TAC
+summarization tasks, by using several smoothing techniques.
+As a novel idea, we contemplate the possibility of adapting
+the evaluation framework for the phrase compression task
+[29], which, to our knowledge, does not have an efﬁcient
+evaluation measure. The main idea is to calculate JS from
+an automatically-compressed sentence taking the complete
+sentence by reference. In the long term, we plan to incorporatea representation of the task/topic in the calculation of
+measures. To carry out these comparisons, however, we are
+dependent on the existence of references.
+FRESA will also be used in the new question-answer task
+campaign INEX’2010 (http://www.inex.otago.ac.nz/tracks/qa/
+qa.asp) for the evaluation of long answers. This task aims
+to answer a question by extraction and agglomeration of
+sentences in Wikipedia. This kind of task corresponds
+to those for which we have found a high correlation
+among the measures JS and evaluation methods with
+human intervention. Moreover, the JS calculation will be
+among the summaries produced and a representative set of
+relevant passages from Wikipedia. F RESA will be used to
+compare three types of systems, although different tasks: the
+multi-document summarizer guided by a query, the search
+systems targeted information (focused IR) and the question
+answering systems.
+ACKNOWLEDGMENT
+We are grateful to the Programa Ram ´on y Cajal from
+Ministerio de Ciencia e Innovaci ´on, Spain. This work is
+partially supported by: a postdoctoral grant from the National
+Program for Mobility of Research Human Resources (National
+Plan of Scientiﬁc Research, Development and Innovation
+2008-2011, Ministerio de Ciencia e Innovaci ´on, Spain); the
+research project CONACyT, number 82050, and the research
+project PAPIIT-DGAPA (Universidad Nacional Aut ´onoma de
+M´exico), number IN403108.
+Juan-Manuel Torres-Moreno, Horacio Saggion, Iria da Cunha, Eric SanJuan, and Patricia Velázquez-Morales
+18
+Polibits (42) 2010TABLE VI
+SPEARMANOF CONTENT -BASED MEASURES WITH ROUGE IN THE PISTES C ORPUS (FRENCH )
+Mesure ROUGE -1p-value ROUGE -2p-value ROUGE -SU4p-value
+JS 0.70p<0:050 0.73p<0:05 0.73p<0:500
+JS2 0.93p<0:002 0.86p<0:01 0.86p<0:005
+JS4 0.83p<0:020 0.76p<0:05 0.76p<0:050
+JSM 0.88p<0:010 0.83p<0:02 0.83p<0:010
+TABLE VII
+SPEARMANOF CONTENT -BASED MEASURES WITH ROUGE IN THE RPM2 C ORPUS (FRENCH )
+Measure ROUGE -1p-value ROUGE -2p-value ROUGE -SU4p-value
+JS 0.830p<0:002 0.660p<0:05 0.741 p<0:01
+JS2 0.800p<0:005 0.590p<0:05 0.680 p<0:02
+JS4 0.750p<0:010 0.520p<0:10 0.620 p<0:05
+JSM 0.850p<0:002 0.640p<0:05 0.740 p<0:01
+REFERENCES
+[1] I. Mani, G. Klein, D. House, L. Hirschman, T. Firmin, and
+B. Sundheim, “Summac: a text summarization evaluation,” Natural
+Language Engineering , vol. 8, no. 1, pp. 43–68, 2002.
+[2] P. Over, H. Dang, and D. Harman, “DUC in context,” IPM, vol. 43,
+no. 6, pp. 1506–1520, 2007.
+[3]Proceedings of the Text Analysis Conference . Gaithesburg, Maryland,
+USA: NIST, November 17-19 2008.
+[4] K. Sp ¨arck Jones and J. Galliers, Evaluating Natural Language
+Processing Systems, An Analysis and Review , ser. Lecture Notes in
+Computer Science. Springer, 1996, vol. 1083.
+[5] R. L. Donaway, K. W. Drummey, and L. A. Mather, “A comparison of
+rankings produced by summarization evaluation measures,” in NAACL
+Workshop on Automatic Summarization , 2000, pp. 69–78.
+[6] H. Saggion, D. Radev, S. Teufel, and W. Lam, “Meta-evaluation
+of Summaries in a Cross-lingual Environment using Content-based
+Metrics,” in COLING 2002 , Taipei, Taiwan, August 2002, pp. 849–855.
+[7] D. R. Radev, S. Teufel, H. Saggion, W. Lam, J. Blitzer, H. Qi, A. C ¸ elebi,
+D. Liu, and E. Dr ´abek, “Evaluation challenges in large-scale document
+summarization,” in ACL’03 , 2003, pp. 375–382.
+[8] K. Papineni, S. Roukos, T. Ward, , and W. J. Zhu, “BLEU: a method
+for automatic evaluation of machine translation,” in ACL’02 , 2002, pp.
+311–318.
+[9] K. Pastra and H. Saggion, “Colouring summaries BLEU,” in Evaluation
+Initiatives in Natural Language Processing . Budapest, Hungary: EACL,
+14 April 2003.
+[10] C.-Y . Lin, “ROUGE: A Package for Automatic Evaluation of
+Summaries,” in Text Summarization Branches Out: ACL-04 Workshop ,
+M.-F. Moens and S. Szpakowicz, Eds., Barcelona, July 2004, pp. 74–81.
+[11] A. Nenkova and R. J. Passonneau, “Evaluating Content Selection in
+Summarization: The Pyramid Method,” in HLT-NAACL , 2004, pp.
+145–152.
+[12] A. Louis and A. Nenkova, “Automatically Evaluating Content Selection
+in Summarization without Human Models,” in Empirical Methods in
+Natural Language Processing , Singapore, August 2009, pp. 306–314.
+[Online]. Available: http://www.aclweb.org/anthology/D/D09/D09-1032
+[13] J. Lin, “Divergence Measures based on the Shannon Entropy,” IEEE
+Transactions on Information Theory , vol. 37, no. 145-151, 1991.
+[14] C.-Y . Lin and E. Hovy, “Automatic Evaluation of Summaries Using
+N-gram Co-occurrence Statistics,” in HLT-NAACL . Morristown, NJ,
+USA: Association for Computational Linguistics, 2003, pp. 71–78.
+[15] C.-Y . Lin, G. Cao, J. Gao, and J.-Y . Nie, “An information-theoretic
+approach to automatic evaluation of summaries,” in HLT-NAACL ,
+Morristown, USA, 2006, pp. 463–470.
+[16] S. Kullback and R. Leibler, “On information and sufﬁciency,” Ann. of
+Math. Stat. , vol. 22, no. 1, pp. 79–86, 1951.
+[17] S. Siegel and N. Castellan, Nonparametric Statistics for the Behavioral
+Sciences . McGraw-Hill, 1998.[18] C. de Loupy, M. Gu ´egan, C. Ayache, S. Seng, and J.-M. Torres-Moreno,
+“A French Human Reference Corpus for multi-documents
+summarization and sentence compression,” in LREC’10 , vol. 2,
+Malta, 2010, p. In press.
+[19] S. Fernandez, E. SanJuan, and J.-M. Torres-Moreno, “Textual Energy
+of Associative Memories: performants applications of Enertex algorithm
+in text summarization and topic segmentation,” in MICAI’07 , 2007, pp.
+861–871.
+[20] J.-M. Torres-Moreno, P. Vel ´azquez-Morales, and J.-G. Meunier,
+“Condens ´es de textes par des m ´ethodes num ´eriques,” in JADT’02 , vol. 2,
+St Malo, France, 2002, pp. 723–734.
+[21] J. Vivaldi, I. da Cunha, J.-M. Torres-Moreno, and P. Vel ´azquez-Morales,
+“Automatic summarization using terminological and semantic
+resources,” in LREC’10 , vol. 2, Malta, 2010, p. In press.
+[22] J.-M. Torres-Moreno and J. Ramirez, “REG : un algorithme glouton
+appliqu ´e au r ´esum ´e automatique de texte,” in JADT’10 . Rome, 2010,
+p. In press.
+[23] V . Yatsko and T. Vishnyakov, “A method for evaluating modern
+systems of automatic text summarization,” Automatic Documentation
+and Mathematical Linguistics , vol. 41, no. 3, pp. 93–103, 2007.
+[24] C. D. Manning and H. Sch ¨utze, Foundations of Statistical Natural
+Language Processing . Cambridge, Massachusetts: The MIT Press,
+1999.
+[25] K. Sp ¨arck Jones, “Automatic summarising: The state of the art,” IPM,
+vol. 43, no. 6, pp. 1449–1481, 2007.
+[26] I. da Cunha, L. Wanner, and M. T. Cabr ´e, “Summarization of specialized
+discourse: The case of medical articles in spanish,” Terminology , vol. 13,
+no. 2, pp. 249–286, 2007.
+[27] C.-K. Chuah, “Types of lexical substitution in abstracting,” in ACL
+Student Research Workshop . Toulouse, France: Association for
+Computational Linguistics, 9-11 July 2001 2001, pp. 49–54.
+[28] K. Owkzarzak and H. T. Dang, “Evaluation of automatic summaries:
+Metrics under varying data conditions,” in UCNLG+Sum’09 , Suntec,
+Singapore, August 2009, pp. 23–30.
+[29] K. Knight and D. Marcu, “Statistics-based summarization-step one:
+Sentence compression,” in Proceedings of the National Conference on
+Artiﬁcial Intelligence . Menlo Park, CA; Cambridge, MA; London;
+AAAI Press; MIT Press; 1999, 2000, pp. 703–710.
+Summary Evaluation with and without References
+19
+Polibits (42) 2010
