@@ -5,6 +5,9 @@ from PyPDF2 import PdfReader
 
 
 def transformAccent(line):
+    """
+    
+    """
     accents = {
         "`": {
             "a": "à",
@@ -49,6 +52,10 @@ def getTitle(metadata,text):
     return title
 
 def getAuthors(metadata,text):
+    """
+    Extracts the authors and their emails from the PDF
+    The authors are extracted from the metadata or with multiple regex if the metadata are not filled in
+    """
     if(metadata.author!="" and metadata.author!=None):
         authors = metadata.author
     else:
@@ -60,7 +67,9 @@ def getAuthors(metadata,text):
     return authors
 
 def getAbstract(pdf):
-
+    """
+    Extracts the abstract from the PDF, first using the metadata and then multiple regex to achieve the highest accurency possible
+    """
     text = pdf.pages[0].extract_text()
     abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
     abstract_match = re.findall(abstract_regex, text)
@@ -126,13 +135,15 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
     outputString+="Bibliographie : "
     if(output_file_name!=""):
-        fd = os.open(output_file_name,flags=os.O_RDWR|os.O_CREAT)
+        fd = os.open(output_file_name,flags=os.O_RDWR|os.O_CREAT|os.O_TRUNC)
         text = str.encode(outputString)
         lgtext = os.write(fd,text)
         if(lgtext==0):
             sys.stderr("Aucune données n'a pu être extraite")
         os.close(fd)
     return outputString
+
+
 def writeXML(file_name,output_file_name,text,metadata,pdf):
     """
     Writes all the capital information in a .xml file with an XML layout
@@ -141,18 +152,25 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>"
-    outputXML+= "\n</article>"
+
+
+    outputXML+="\n\t</auteurs>\n"
+    outputXML+="\t<abstract> "+getAbstract(pdf).replace("\n"," ")+" </abstract>\n"
+    outputXML+="\t<biblio> "+" </biblio>\n"
+    
+    outputXML+= "</article>"
     if(output_file_name!=""):
-        fd = os.open(output_file_name,flags=os.O_RDWR |os.O_CREAT)
+        fd = os.open(output_file_name,flags=os.O_RDWR |os.O_CREAT | os.O_TRUNC)
         text = str.encode(outputXML)
         lgtext = os.write(fd,text)
         if(lgtext==0):
             sys.stderr("Aucune données n'a pu être extraite")
         os.close(fd)
-
+    return outputXML
 
 def launchExtraction(args):
     argsList = vars(args)
+    #print(args)
     output_file_name = ""
     if(argsList['out']!=None) : 
             output_file_name = argsList['out']
@@ -166,7 +184,7 @@ def launchExtraction(args):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Parseur d'articles scientifiques")
+    parser = argparse.ArgumentParser(description="Parser for scientific papers")
     parser.add_argument('-t',action='store_true',help='To be set if the output should be saved in a .txt')
     parser.add_argument('-x',action='store_true',help='To be set if the output should be saved in a .xml')
     parser.add_argument('filename',help='The path to the file that needs to be converted')
