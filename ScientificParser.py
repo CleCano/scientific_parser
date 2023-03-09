@@ -38,18 +38,18 @@ def transformAccent(line):
     return line
 
 def getTitle(metadata,text):
-    if(metadata.title!="" and metadata.title!="None"):
+    if(metadata.title!="" and metadata.title!=None):
         title = metadata.title
     else:
         # Use regular expressions to extract the title
         title_regex = re.compile(r"Title:\s*(.*)")
         title_match = re.search(title_regex, text)
         title = title_match.group(1).strip() if title_match else ""
-    
+
     return title
 
 def getAuthors(metadata,text):
-    if(metadata.author!="" and metadata.author!="None"):
+    if(metadata.author!="" and metadata.author!=None):
         authors = metadata.author
     else:
         # Use regular expressions to extract the author
@@ -126,7 +126,7 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
     outputString+="Bibliographie : "
     if(output_file_name!=""):
-        fd = os.open(output_file_name,flags=os.O_RDWR)
+        fd = os.open(output_file_name,flags=os.O_RDWR|os.O_CREAT)
         text = str.encode(outputString)
         lgtext = os.write(fd,text)
         if(lgtext==0):
@@ -141,9 +141,9 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>"
-    outputXML = "</article>"
+    outputXML+= "\n</article>"
     if(output_file_name!=""):
-        fd = os.open(output_file_name,flags=os.O_RDWR)
+        fd = os.open(output_file_name,flags=os.O_RDWR |os.O_CREAT)
         text = str.encode(outputXML)
         lgtext = os.write(fd,text)
         if(lgtext==0):
