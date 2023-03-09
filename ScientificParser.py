@@ -62,10 +62,13 @@ def getAuthors(metadata,text):
 def getAbstract(pdf):
 
     text = pdf.pages[0].extract_text()
-
-    abstract_regex = re.compile(r"(Abstract ?.?\.? ?)|(In this article|This article presents)((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
+    abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
     abstract_match = re.findall(abstract_regex, text)
     abstract = abstract_match.pop() if abstract_match else ""
+    if abstract == "":
+        abstract_regex = re.compile(r"(Abstract ?.?\.? ?)|(In this article|This article presents)((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
+        abstract_match = re.findall(abstract_regex, text)
+        abstract = abstract_match.pop() if abstract_match else ""
     finalAbstract=""
     for i in abstract:
         finalAbstract+=i
@@ -120,14 +123,13 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     outputString = "Nom du fichier : "+file_name+"\n"
     outputString+="Titre de l'article : "+getTitle(metadata,text)+"\n"
     outputString+="Auteurs : "+"\n"
-    print(getAbstract(pdf))
-    #outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
+    outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
     outputString+="Bibliographie : "
     if(output_file_name!=""):
         fd = os.open(output_file_name,flags=os.O_RDWR)
         text = str.encode(outputString)
-        lgText = os.write(fd,text)
-        if(lgText==0):
+        lgtext = os.write(fd,text)
+        if(lgtext==0):
             sys.stderr("Aucune données n'a pu être extraite")
         os.close(fd)
     return outputString
@@ -135,6 +137,18 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     """
     Writes all the capital information in a .xml file with an XML layout
     """
+    outputXML = "<article>\n"
+    outputXML+="\t<preamble>"+file_name+"</preamble>\n"
+    outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
+    outputXML+="\t<auteurs>"
+    outputXML = "</article>"
+    if(output_file_name!=""):
+        fd = os.open(output_file_name,flags=os.O_RDWR)
+        text = str.encode(outputXML)
+        lgtext = os.write(fd,text)
+        if(lgtext==0):
+            sys.stderr("Aucune données n'a pu être extraite")
+        os.close(fd)
 
 
 def launchExtraction(args):
