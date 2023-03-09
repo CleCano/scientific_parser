@@ -3,6 +3,40 @@ import os
 import sys
 from PyPDF2 import PdfReader
 
+
+def transformAccent(line):
+    accents = {
+        "`": {
+            "a": "à",
+            "e": "è",
+            "i": "ì",
+            "o": "ò",
+            "u": "ù"
+        },
+        "´": {
+            "e": "é"
+        },
+        "¨": {
+            "a": "ä",
+            "e": "ë",
+            "i": "ï",
+            "o": "ö",
+            "u": "ü",
+            "y": "ÿ"
+        },
+        "^": {
+            "a": "â",
+            "e": "ê",
+            "i": "î",
+            "o": "ô",
+            "u": "û"
+        }
+    }
+    for ac in accents:
+        for letter in accents[ac]:
+            line = line.replace(" "+ ac + letter, accents[ac][letter])
+    return line
+
 def getTitle(metadata,text):
     if(metadata.title!="" and metadata.title!="None"):
         title = metadata.title
@@ -76,7 +110,7 @@ def convertPdfToText(file_path):
         text = ""
         for page_num in range(len(pdf.pages)):
             page = pdf.pages[page_num]
-            text += page.extract_text()
+            text += transformAccent(page.extract_text())
     return (text,metadata,pdf)
 
 def writeTxt(file_name,output_file_name,text,metadata,pdf):
