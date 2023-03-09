@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import os
+import argparse
+from ScientificParser import *
 from tkinter import *
 from tkinter import filedialog
 import time
@@ -12,9 +14,21 @@ def file_open():
    exeCommand(fileIn,boolTextXml)
    
 def exeCommand(fileIn,textOrXml):
-   command = ("echo "+textOrXml.get()+" "+fileIn)
-   print(command)
-   os.system(command)
+   param = ""
+   args = argparse.Namespace()
+   args.t = textOrXml.get()
+   args.x = not textOrXml.get()
+   args.filename = fileIn
+   args.out = None
+   print(args)
+
+   text_preview.config(state=NORMAL)
+   text_preview.delete(1.0,END)
+   text_preview.insert(END,launchExtraction(args))
+   text_preview.config(state=DISABLED)
+   
+   
+ 
    
 
 
@@ -25,8 +39,10 @@ def file_save():
    if (boolTextXml.get()):files = [("Text File", ".txt")]
    else : files = files = [("XML File", ".xml")]
    file = filedialog.asksaveasfilename(filetypes=files,defaultextension=files)
+
 def on_select():
-   print("Radio button sélectionné",boolTextXml.get())
+   if(fileIn!= ""):
+      exeCommand(fileIn,boolTextXml)
    
 
 # Créer une fenêtre Tkinter
@@ -54,8 +70,14 @@ radButton_xml_option.pack(side='left', padx=10)
 frame_middle = Frame(window)
 frame_middle.pack(padx=10, pady=10)
 
-text_preview = Text(frame_middle, width=50, height=10, state='disabled')
-text_preview.pack()
+
+text_preview = Text(frame_middle,wrap='none')
+scrollbar = Scrollbar(frame_middle, orient='horizontal', command=text_preview.xview)
+
+# Lier la barre de défilement à la zone de texte
+text_preview.configure(xscrollcommand=scrollbar.set)
+text_preview.pack(side='top', fill='both', expand=True)
+scrollbar.pack(side='bottom', fill='x')
 
 # En bas : à gauche un bouton "Choose path", au milieu une zone de texte "outName", à droite un bouton "Save"
 frame_bottom = Frame(window)
