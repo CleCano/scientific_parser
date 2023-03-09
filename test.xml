@@ -1,8 +1,8 @@
 <article>
-	<preamble>mikheev J02-3002.pdf</preamble>
-	<titre>/c/1997c/tops/dvips</titre>
+	<preamble>Torres.pdf</preamble>
+	<titre>Summary Evaluation with and without References</titre>
 	<auteurs>
 	</auteurs>
-	<abstract> In this article we present an approach for tackling three important aspects of text normalization: sentence boundary disambiguation, disambiguation of capitalized words in positions wherecapitalization is expected, and identiﬁcation of abbreviations. As opposed to the two dominanttechniques of computing statistics or writing specialized grammars, our document-centered ap-proach works by considering suggestive local contexts and repetitions of individual words withina document. This approach proved to be robust to domain shifts and new lexica and produced per-formance on the level with the highest reported results. When incorporated into a part-of-speechtagger, it helped reduce the error rate signiﬁcantly on capitalized words and sentence boundaries.We also investigated the portability to other languages and obtained encouraging results. </abstract>
+	<abstract> We study a new content-based method for the evaluation of text summarization systems without human models which is used to produce system rankings. The research is carried out using a new content-based evaluation framework called FRESA to compute a variety of divergences among probability distributions. We apply our comparison framework to various well-established content-based evaluation measures in text summarization such as COVERAGE , RESPONSIVENESS ,PYRAMIDS and ROUGE studying their associations in various text summarization tasks including generic multi-document summarization in English and French, focus-based multi-document summarization in English and generic single-document summarization in French and Spanish. Index Terms —Text summarization evaluation, content-based evaluation measures, divergences. </abstract>
 	<biblio>  </biblio>
 </article>

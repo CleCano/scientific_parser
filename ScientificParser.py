@@ -41,15 +41,65 @@ def transformAccent(line):
     return line
 
 def getTitle(metadata,text):
-    if(metadata.title!="" and metadata.title!=None):
-        title = metadata.title
+    title = None
+    circlecopyrt = re.compile(r'.*circlecopyrt.*')
+    if "/Title" in metadata and metadata["/Title"] != None and metadata["/Title"].rstrip() != "" and metadata["/Title"].count("/") <=2 and not circlecopyrt.search(metadata["/Title"]):
+        title = metadata["/Title"]
     else:
-        # Use regular expressions to extract the title
-        title_regex = re.compile(r"Title:\s*(.*)")
-        title_match = re.search(title_regex, text)
-        title = title_match.group(1).strip() if title_match else ""
-
+        ss = text.split("\n")
+        regexp = re.compile(r'((.*pages.*)|(.*[12][0-9]{3}$.*)|(.*©.*)|(.*circlecopyrt.*))')
+        i = 0
+        cancel = False
+        while(regexp.search(ss[i])):
+            #TODO On regarde si la ligne qu'on va sauter ne contient pas un mot contenant deux Majuscule
+            #Ce qui est le cas quand la phrase de fin de fichier est suivi du titre sans qu'un retour
+            # à la ligne n'est été inséré
+            titleimbrique = re.compile(r'[A-Z]\w{3,}([A-Z].*)') # Regex qui prend dans une phrase un mot qui contient 2 maj qui sont séparé par minimum 3 minuscules
+            rs = re.search(titleimbrique, ss[i])
+            if(rs):
+                title = rs.groups(1)[0]
+                cancel = True                
+                break
+            i += 1
+        if (not cancel):
+            title = ss[i]
+            startWithMinuscule = re.compile(r'(^[a-z]{1,}.*)')
+            i += 1
+            while(startWithMinuscule.match(ss[i])):
+                title += " " + ss[i]
+                i += 1
+            #Le mot qui suit le titre peut aussi comporter une Majuscule et c'est en majorité le cas
+            #Cependant ces mots sont séparé souvent par des mots de liaisons 
+            #Donc si nous en avons en fin de ligne, alors cela veut dire que la ligne suivante fait partie du titre
+            haveLisaisonWord = re.compile(r'.*(in|for|of|as|with|into|to|from)$')
+            while(haveLisaisonWord.match(title)):
+                title += " " + ss[i]
+                i += 1
+    
     return title
+
+def getBiblio(metadata,text):
+    biblio=""
+
+    return biblio
+
+
+def getAdresses(pdf):
+
+    text = pdf.pages[0].extract_text()
+    emails = re.findall("([a-zA-Z0-9_.+\-[),]+\s?@[a-zA-Z0-9-]+\.[a-z-.]+)", text)
+
+    for i in range(len(emails)):
+        if(re.findall("([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+", emails[i])): ""
+        else: #split les emails factorisé avec des virgules et remettre le @
+            ungroupEmails = emails[i].split(",")
+            arrobase = re.findall("@[a-zA-Z0-9-]+\.[a-z-.]+", ungroupEmails[len(ungroupEmails)-1])
+            ungroupEmails[len(ungroupEmails)-1] = re.sub("[),]+\s@[a-zA-Z0-9-]+\.[a-z-.]+","",ungroupEmails[len(ungroupEmails)-1])
+            for j in range(len(ungroupEmails)):
+                ungroupEmails[j] += arrobase[0]
+                emails = ungroupEmails
+
+    return emails
 
 def getAuthors(metadata,text):
     """
