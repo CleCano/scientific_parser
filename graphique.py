@@ -11,22 +11,24 @@ def file_open():
    global fileIn
    path = filedialog.askopenfilename(initialdir='~')
    fileIn = path
+   
    exeCommand(fileIn,boolTextXml)
    
+   
 def exeCommand(fileIn,textOrXml):
-   param = ""
+   
+
    args = argparse.Namespace()
    args.t = textOrXml.get()
    args.x = not textOrXml.get()
    args.filename = fileIn
    args.out = None
-   print(args)
+   
 
    text_preview.config(state=NORMAL)
    text_preview.delete(1.0,END)
    text_preview.insert(END,launchExtraction(args))
    text_preview.config(state=DISABLED)
-   
    
  
    
@@ -36,9 +38,13 @@ def exeCommand(fileIn,textOrXml):
 
 def file_save():
 
-   if (boolTextXml.get()):files = [("Text File", ".txt")]
-   else : files = files = [("XML File", ".xml")]
-   file = filedialog.asksaveasfilename(filetypes=files,defaultextension=files)
+   if boolTextXml.get():
+        files = [("Text File", ".txt")]
+   else:
+        files = [("XML File", ".xml")]
+   print(files[0])
+   file = filedialog.asksaveasfile(mode='w', filetypes=files, defaultextension=files[0][1])
+   file.write(text_preview.get(1.0,END))
 
 def on_select():
    if(fileIn!= ""):
