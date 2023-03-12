@@ -10,7 +10,7 @@
   
   - Ouvrir un shell  
   - Se placer dans le dossier d'installation "scientific_parser_IUTEAM"  
-  - Lancer la commande : ./graphique.py  
+  - Lancer la commande : `./graphique.py`
 
 ### Utiliser l'interface graphique :
 
@@ -22,8 +22,8 @@
 
 ### Utiliser uniquement en ligne de commande :
 
-  - Se placer dans le dossier scientific_parser_IUTEAM
-  - Utiliser la commande python3 ScientificParser.py
+  - Se placer dans le dossier ```scientific_parser_IUTEAM```
+  - Utiliser la commande `python3 ScientificParser.py`
   - Les différentes options de la commande sont spécifiées dans le manuel d'aide de celle-ci
   - Il est possible de spécifier le nom du fichier de sortie souhaité, s'il n'est pas renseigné le fichier de sortie prendra le même nom que celui d'entrée et l'extension sera adapté à la conversion effectuée 
 
