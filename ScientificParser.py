@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import re
 import os
 import sys
@@ -78,9 +79,12 @@ def getTitle(metadata,text):
     
     return title
 
-def getBiblio(metadata,text):
+def getBiblio(text):
     biblio=""
-
+    # Use regular expressions to extract the author
+    biblio_regex = re.compile(r"References\n((?:.|\n)*)")
+    biblio_match = re.findall(biblio_regex, text)
+    biblio = biblio_match.pop() if biblio_match else ""
     return biblio
 
 
@@ -182,8 +186,13 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     outputString = "Nom du fichier : "+file_name+"\n"
     outputString+="Titre de l'article : "+getTitle(metadata,text)+"\n"
     outputString+="Auteurs : "+"\n"
+
+
+    #auteurs = getAuthors(metadata,text).split(";")
+    #emails = getAdresse(pdf)
+
     outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
-    outputString+="Bibliographie : "
+    outputString+="Bibliographie : "+getBiblio(text)+"\n"
     if(output_file_name!=""):
         fd = os.open(output_file_name,flags=os.O_RDWR|os.O_CREAT|os.O_TRUNC)
         text = str.encode(outputString)
@@ -201,12 +210,14 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML = "<article>\n"
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
-    outputXML+="\t<auteurs>"
+    outputXML+="\t<auteurs>\n"
+    outputXML+="\t\t"
 
-
+    #auteurs = getAuthors(metadata,text).split(";")
+    #emails = getAdresse(pdf)
     outputXML+="\n\t</auteurs>\n"
     outputXML+="\t<abstract> "+getAbstract(pdf).replace("\n"," ")+" </abstract>\n"
-    outputXML+="\t<biblio> "+" </biblio>\n"
+    outputXML+="\t<biblio> "+getBiblio(text).replace("\n"," ")+" </biblio>\n"
     
     outputXML+= "</article>"
     if(output_file_name!=""):
