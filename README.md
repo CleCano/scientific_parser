@@ -8,9 +8,9 @@
 
 ### Lancement de l'interface graphique :
   
-  -Ouvrir un shell  
-  -Se placer dans le dossier d'installation "scientific_parser_IUTEAM"  
-  -Lancer la commande : ./graphique.py  
+  - Ouvrir un shell  
+  - Se placer dans le dossier d'installation "scientific_parser_IUTEAM"  
+  - Lancer la commande : ./graphique.py  
 
 ### Utiliser l'interface graphique :
 
