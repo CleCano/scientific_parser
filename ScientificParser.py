@@ -6,9 +6,6 @@ from PyPDF2 import PdfReader
 
 
 def transformAccent(line):
-    """
-    
-    """
     accents = {
         "`": {
             "a": "à",
@@ -18,7 +15,9 @@ def transformAccent(line):
             "u": "ù"
         },
         "´": {
-            "e": "é"
+            "e": "é",
+            "a": "á",
+            "E": "É"
         },
         "¨": {
             "a": "ä",
@@ -33,12 +32,26 @@ def transformAccent(line):
             "e": "ê",
             "i": "î",
             "o": "ô",
-            "u": "û"
+            "u": "û",
+            "ı": "î"
+        },
+        "ˆ": {
+            "a": "â",
+            "e": "ê",
+            "i": "î",
+            "o": "ô",
+            "u": "û",
+            "ı": "î"
+        },
+        "c": {
+            "¸": "ç"
         }
     }
     for ac in accents:
         for letter in accents[ac]:
             line = line.replace(" "+ ac + letter, accents[ac][letter])
+            line = line.replace(ac + " " + letter, accents[ac][letter])
+            line = line.replace(ac + letter, accents[ac][letter])
     return line
 
 def getTitle(metadata,text):
@@ -85,7 +98,7 @@ def getBiblio(text):
     biblio_regex = re.compile(r"References\n((?:.|\n)*)")
     biblio_match = re.findall(biblio_regex, text)
     biblio = biblio_match.pop() if biblio_match else ""
-    return biblio
+    return biblio.replace('-\n','').replace("\n"," ")
 
 
 def getAdresses(pdf):
@@ -135,7 +148,33 @@ def getAbstract(pdf):
     finalAbstract=""
     for i in abstract:
         finalAbstract+=i
-    return finalAbstract.replace('-\n','')
+    return finalAbstract.replace('-\n','').replace("\n"," ")
+
+
+def getIntroduction(text):
+    """
+    Extracts the introduction of a scientific paper using a regex
+    """
+    intro_regex = re.compile(r"[1I]\.? Introduction\s+((?:.|\n)*?)^[2-9]|II\.?")
+    intro_match = re.search(intro_regex, text)
+    intro = intro_match.group(1).strip() if intro_match else ""
+    finalIntro=""
+    for i in intro:
+        finalIntro+=i
+
+    intro2_regex ="[1I]\.? Introduction\s+((?:.|\n)*?)^[2-9]|II\.?"
+    matches = re.finditer(intro2_regex, text, re.MULTILINE)
+    for matchNum, match in enumerate(matches, start=1):
+        
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+        
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            if(groupNum==1):
+                finalIntro=match.group(groupNum)
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+    
+    return finalIntro.replace('-\n','').replace('\n','')
 
 def extract_pdf_info(file_path):
     """
@@ -212,12 +251,12 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>\n"
     outputXML+="\t\t"
-
     #auteurs = getAuthors(metadata,text).split(";")
     #emails = getAdresse(pdf)
     outputXML+="\n\t</auteurs>\n"
-    outputXML+="\t<abstract> "+getAbstract(pdf).replace("\n"," ")+" </abstract>\n"
-    outputXML+="\t<biblio> "+getBiblio(text).replace("\n"," ")+" </biblio>\n"
+    outputXML+="\t<abstract> "+getAbstract(pdf)+" </abstract>\n"
+    outputXML+="\t<introduction> "+getIntroduction(text)+" </introduction>\n"
+    outputXML+="\t<biblio> "+getBiblio(text)+" </biblio>\n"
     
     outputXML+= "</article>"
     if(output_file_name!=""):
