@@ -43,5 +43,6 @@
 ### La librairie ```tkinter``` pour l'interface graphique de l'application.
 
 ` sudo apt-get install python3-tk`
+`pip3 install customtkinter`
 
 ---
