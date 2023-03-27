@@ -45,6 +45,9 @@ def transformAccent(line):
         },
         "c": {
             "¸": "ç"
+        },
+        "": {
+            "e": "é"
         }
     }
     for ac in accents:
@@ -53,7 +56,6 @@ def transformAccent(line):
             line = line.replace(ac + " " + letter, accents[ac][letter])
             line = line.replace(ac + letter, accents[ac][letter])
     return line
-
 def getTitle(metadata,text):
     title = None
     circlecopyrt = re.compile(r'.*circlecopyrt.*')
