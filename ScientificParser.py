@@ -48,7 +48,8 @@ def transformAccent(line):
         },
         "": {
             "e": "é"
-        }
+        },
+
     }
     for ac in accents:
         for letter in accents[ac]:
@@ -56,6 +57,7 @@ def transformAccent(line):
             line = line.replace(ac + " " + letter, accents[ac][letter])
             line = line.replace(ac + letter, accents[ac][letter])
     return line
+
 def getTitle(metadata,text):
     title = None
     circlecopyrt = re.compile(r'.*circlecopyrt.*')
@@ -120,19 +122,27 @@ def getAdresses(pdf):
 
     return emails
 
-def getAuthors(metadata,text):
-    """
-    Extracts the authors and their emails from the PDF
-    The authors are extracted from the metadata or with multiple regex if the metadata are not filled in
-    """
-    if(metadata.author!="" and metadata.author!=None):
-        authors = metadata.author
-    else:
-        # Use regular expressions to extract the author
-        authors_regex = re.compile(r"Author\(s\):\s*(.*)")
-        authors_match = re.search(authors_regex, text)
-        authors = authors_match.group(1).strip() if authors_match else ""
+def getAuthors(metadata,text, title):
+    authors = {}
+    # On sépare les lignes
+    ss = text.split("\n")
+    i = 0
+    # On commence par virer les lignes inutiles et le titre
+    found = False
+    while(not found or ss[i].split("\n")[0].strip() in title):
+        if ss[i].split("\n")[0].strip() in title or title in ss[i]:
+            found = True
+        i += 1
+    #premiere ligne avec les auteurs dedans :
+    #print("|", ss[i].strip(), "|")
+    # regex nom + prenom autheur : 
+    a = [x.group() for x in re.finditer( r'((([A-Z]([a-z]|é|á|è|ç|î)*)|[A-Z].)(( [a-z]* )|-| )([A-Z].[A-Z]. |[A-Z]. )?(([A-Z]|[a-z]|é|á|è|ç|î)*(-[A-Z]([a-z]|é|á|è|ç|î)*)?))', ss[i].strip())]
     
+    i = 0
+    for b in a:
+        authors[i] = b
+        i +=1
+
     return authors
 
 def getAbstract(pdf):
@@ -157,15 +167,10 @@ def getIntroduction(text):
     """
     Extracts the introduction of a scientific paper using a regex
     """
-    intro_regex = re.compile(r"[1I]\.? Introduction\s+((?:.|\n)*?)^[2-9]|II\.?")
-    intro_match = re.search(intro_regex, text)
-    intro = intro_match.group(1).strip() if intro_match else ""
-    finalIntro=""
-    for i in intro:
-        finalIntro+=i
 
-    intro2_regex ="[1I]\.? Introduction\s+((?:.|\n)*?)^[2-9]|II\.?"
+    intro2_regex ="[1I]\.? Introduction ?(?:.* *)\n((?:.|\n)*?)^([2-9]|II|III|IV|V|VI|VII|VIII|IX|X)\.? "
     matches = re.finditer(intro2_regex, text, re.MULTILINE)
+    finalIntro=""
     for matchNum, match in enumerate(matches, start=1):
         
         #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
@@ -177,6 +182,53 @@ def getIntroduction(text):
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
     return finalIntro.replace('-\n','').replace('\n','')
+
+def getConclusion(text):
+    """
+    Extracts the conclusion of a scientific paper using a regex
+    
+    conclu_regex = re.compile(r"[1-9IVX]*\.? Conclusions\s+((?:.|\n)*?)^[2-9]|II*\.?")
+    conclu_match = re.findall(conclu_regex, text)
+    conclu = conclu_match.pop() if conclu_match else ""
+    finalconclu=""
+    for i in conclu:
+        finalconclu+=i
+    
+    """
+    conclu2_regex ="[1-9]\.? Conclusions\s+((?:.|\n)*?)^[2-9]\.?"
+    matches = re.finditer(conclu2_regex, text, re.MULTILINE)
+    finalconclu=""
+    for matchNum, match in enumerate(matches, start=1):
+        
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+        
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            if(groupNum==1):
+                finalconclu=match.group(groupNum)
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+    
+    return finalconclu.replace('-\n','').replace('\n','') 
+
+def getDiscussion(text):
+    """
+    Extracts the discussion of a scientific paper using a regex
+    """
+    discu2_regex ="[1-9]{0,2}\.? (?:Discussion|discussion) ?(?:.* *)\n((?:.|\n)*?)^(([2-9]{0,2}\.? )|References|Conclusion)"
+    matches = re.finditer(discu2_regex, text, re.MULTILINE)
+    finaldiscu=""
+    for matchNum, match in enumerate(matches, start=1):
+        
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+        
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            if(groupNum==1):
+                finaldiscu=match.group(groupNum)
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+    
+    return finaldiscu.replace('-\n','').replace('\n','')
+
 
 def extract_pdf_info(file_path):
     """
@@ -224,7 +276,7 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     """
     Writes all the capital information in a .txt file
     """
-    outputString = "Nom du fichier : "+file_name+"\n"
+    outputString = "Préambule : "+file_name+"\n"
     outputString+="Titre de l'article : "+getTitle(metadata,text)+"\n"
     outputString+="Auteurs : "+"\n"
 
@@ -249,15 +301,20 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     Writes all the capital information in a .xml file with an XML layout
     """
     outputXML = "<article>\n"
-    outputXML+="\t<preamble>"+file_name+"</preamble>\n"
+    outputXML+="\t<preambule>"+file_name+"</preambule>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>\n"
-    outputXML+="\t\t"
-    #auteurs = getAuthors(metadata,text).split(";")
-    #emails = getAdresse(pdf)
-    outputXML+="\n\t</auteurs>\n"
+    auteurs = getAuthors(metadata,text,getTitle(metadata,text))
+    for i in auteurs:
+        outputXML+="\t\t<auteur>"+auteurs[i]+"</auteur>\n"
+    emails = getAdresses(pdf)
+    print(emails)
+    outputXML+="\t</auteurs>\n"
     outputXML+="\t<abstract> "+getAbstract(pdf)+" </abstract>\n"
     outputXML+="\t<introduction> "+getIntroduction(text)+" </introduction>\n"
+    outputXML+="\t<discussion> "+getDiscussion(text)+" </discussion>\n"
+    outputXML+="\t<conclusion> "+getConclusion(text)+" </conclusion>\n"
+
     outputXML+="\t<biblio> "+getBiblio(text)+" </biblio>\n"
     
     outputXML+= "</article>"
