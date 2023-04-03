@@ -5,6 +5,7 @@ from ScientificParser import *
 from tkinter import *
 from tkinter import filedialog
 from customtkinter import *
+import os
 
 
 fileIn = ""
@@ -16,17 +17,20 @@ def clear(event=0):
     fileIn = ""
     text_preview.configure(state=NORMAL)
     text_preview.delete(1.0,END)
-   
+
     text_preview.configure(state=DISABLED)
     button_save.configure(state="disabled")
+    window.title("Scientific Parser")
 
 def file_open(event=0):
    global fileIn
    path = filedialog.askopenfilename(initialdir='~',filetypes=[("PDF files", ".pdf")])
-   fileIn = path
-   
-   exeCommand(fileIn,boolTextXml)
-   
+   if(path):
+      fileIn = path
+      exeCommand(fileIn,boolTextXml)
+      window.title('Scientific Parser - '+ os.path.basename(fileIn))
+
+
 """
 Fonction permetant d'executer la commande qui va extraire les informations du pdf
 """   
@@ -50,14 +54,15 @@ def exeCommand(fileIn,textOrXml):
 Fonction de sauvegarde du fichier 
 """
 def file_save(event=0):
-
-   if boolTextXml.get():
-        files = [("Text File", ".txt")]
-   else:
-        files = [("XML File", ".xml")]
-   print(files[0])
-   file = filedialog.asksaveasfile(mode='w', filetypes=files,defaultextension=files[0][1])
-   file.write(text_preview.get(1.0,END))
+   if( fileIn!=""):
+      if boolTextXml.get():
+           files = [("Text File", ".txt")]
+      else:
+           files = [("XML File", ".xml")]
+      
+      file = filedialog.asksaveasfile(mode='w', filetypes=files,defaultextension=files[0][1],initialfile=(os.path.splitext(os.path.basename(fileIn))[0]+files[0][1]))
+      if(file):
+         file.write(text_preview.get(1.0,END))
 
 def on_select():
    if (boolTextXml2.get()!=boolTextXml.get()):
@@ -75,13 +80,14 @@ def on_select():
 """
 Création de l'interface graphique
 """
+
 set_default_color_theme('dark-blue')
 window = CTk()
 window.title('Scientific Parser')
 
 
 frame_top = CTkFrame(window)
-frame_top.pack(side='top', padx=10, pady=10)
+frame_top.pack(side='top', padx=30, pady=30)
 
 button_open = CTkButton(frame_top, text='Open file', command=file_open)
 button_open.pack(side='left', padx=10)
@@ -105,12 +111,12 @@ frame_middle.pack(padx=10, pady=10)
 
 
 text_preview = CTkTextbox(frame_middle,wrap='word',width=900,height=600)
-scrollbar = CTkScrollbar(frame_middle, orientation='horizontal', command=text_preview.xview)
+
 
 # Lier la barre de défilement à la zone de texte
-text_preview.configure(xscrollcommand=scrollbar.set)
+#text_preview.configure(xscrollcommand=scrollbar.set)
 text_preview.pack(side='top', fill='both', expand=True)
-scrollbar.pack(side='bottom', fill='x')
+
 
 # En bas : à gauche un bouton "Choose path", au milieu une zone de texte "outName", à droite un bouton "Save"
 frame_bottom = CTkFrame(window)
