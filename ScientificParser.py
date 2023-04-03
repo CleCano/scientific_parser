@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import re
 import os
+import numpy
 import sys
 from PyPDF2 import PdfReader
 
@@ -147,7 +148,7 @@ def getAuthors(metadata,text, title):
 
 def getAbstract(pdf):
     """
-    Extracts the abstract from the PDF, first using the metadata and then multiple regex to achieve the highest accurency possible
+    Extracts the abstract from the PDF using multiple regex to achieve the highest accurency possible
     """
     text = pdf.pages[0].extract_text()
     abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
@@ -301,14 +302,22 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     Writes all the capital information in a .xml file with an XML layout
     """
     outputXML = "<article>\n"
-    outputXML+="\t<preambule>"+file_name+"</preambule>\n"
+    outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>\n"
     auteurs = getAuthors(metadata,text,getTitle(metadata,text))
-    for i in auteurs:
-        outputXML+="\t\t<auteur>"+auteurs[i]+"</auteur>\n"
     emails = getAdresses(pdf)
-    print(emails)
+    line = [elem.strip().split('\t') for elem in emails]
+    vals = numpy.asarray(line) 
+    for i in auteurs:
+        outputXML+="\t\t<auteur>\n"
+        outputXML+="\t\t\t<nom>"+auteurs[i]+"</nom>\n"
+        outputXML+="\t\t\t<mail>"
+        if(i<vals.size and vals[i]!=None):
+            outputXML+=emails[i]
+        outputXML+="</mail>\n"
+        outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
+        outputXML+="\t\t</auteur>\n"
     outputXML+="\t</auteurs>\n"
     outputXML+="\t<abstract> "+getAbstract(pdf)+" </abstract>\n"
     outputXML+="\t<introduction> "+getIntroduction(text)+" </introduction>\n"
