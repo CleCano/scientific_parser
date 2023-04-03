@@ -1,4 +1,4 @@
-# scientific_parser : Sprint 4
+# scientific_parser : Sprint 5
 
 ## Explication du système :
 
@@ -18,6 +18,10 @@
   - Vous pourrez ensuite choisir via deux boutons radio le type de sortie souhaité
   - Si jamais vous ne renseignez pas de fichier de sortie le résultat de la conversion sera affiché dans l'espace de texte au milieu de l'interface
   - Il est toujours possible de sauvegarder le contenu de cet espace après conversion via le bouton adapté
+  - Commandes pour agir sur l'interface : 
+    -Ctrl + s : Sauvegarder le fichier résultat
+    -Ctrl + o : Ouvrir la fenêtre pour sélectionner un fichier
+    -Ctrl + x : Effacer la prévisualisation
 
 
 ### Utiliser uniquement en ligne de commande :
