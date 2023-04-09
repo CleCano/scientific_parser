@@ -100,7 +100,7 @@ def getTitle(metadata,text):
 def getBiblio(text):
     biblio=""
     # Use regular expressions to extract the author
-    biblio_regex = re.compile(r"References\n((?:.|\n)*)")
+    biblio_regex = re.compile(r"References|REFERENCES\n((?:.|\n)*)")
     biblio_match = re.findall(biblio_regex, text)
     biblio = biblio_match.pop() if biblio_match else ""
     return biblio.replace('-\n','').replace("\n"," ")
@@ -196,7 +196,7 @@ def getConclusion(text):
         finalconclu+=i
     
     """
-    conclu2_regex ="[1-9]\.? Conclusions\s+((?:.|\n)*?)^[2-9]\.?"
+    conclu2_regex ="[1-9]\.? (Conclusions|Conclusion|CONCLUSION|C ONCLUSION)(s|S)?\s+((?:.|\n)*?)^[2-9]\.?"
     matches = re.finditer(conclu2_regex, text, re.MULTILINE)
     finalconclu=""
     for matchNum, match in enumerate(matches, start=1):
@@ -215,7 +215,7 @@ def getDiscussion(text):
     """
     Extracts the discussion of a scientific paper using a regex
     """
-    discu2_regex ="[1-9]{0,2}\.? (?:Discussion|discussion) ?(?:.* *)\n((?:.|\n)*?)^(([2-9]{0,2}\.? )|References|Conclusion)"
+    discu2_regex ="[1-9]{0,2}\.? (?:Discussion|discussion) ?(?:.* *)\n((?:.|\n)*?)^(([2-9]{0,2}\.? )|References|Conclusion|REFERENCES)"
     matches = re.finditer(discu2_regex, text, re.MULTILINE)
     finaldiscu=""
     for matchNum, match in enumerate(matches, start=1):
@@ -315,6 +315,8 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
         outputXML+="\t\t\t<mail>"
         if(i<vals.size and vals[i]!=None):
             outputXML+=emails[i]
+        else:
+            outputXML+="N/A"
         outputXML+="</mail>\n"
         outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
         outputXML+="\t\t</auteur>\n"
