@@ -58,9 +58,22 @@ def transformAccent(line):
         },
         "&":{
             "":"&amp;amp;"
+        },
+        "":{
+            "":""
+        },
+        "":{
+            "":""
+        },
+        "":{
+            "":"ffi"
+        },
+        "":{
+            "":"*"
+        },
+        "":{
+            "":"*"
         }
-        
-
     }
     for ac in accents:
         for letter in accents[ac]:
