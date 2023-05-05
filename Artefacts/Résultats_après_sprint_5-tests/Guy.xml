@@ -1,0 +1,16 @@
+<article>
+	<preamble>Guy.pdf</preamble>
+	<titre>Skill2vec: Machine Learning Approach for Determining the Relevant</titre>
+	<auteurs>
+		<auteur>
+			<nom>Skills from Job</nom>
+			<mail>me@duyet.net</mail>
+			<affiliation></affiliation>
+		</auteur>
+	</auteurs>
+	<abstract> Unsupervise learned word embeddings have seen tremendous success in numerous Natural Language Processing (NLP) tasks in recent years. The main contribution of this paper is to develop a technique called Skill2vec, which applies machine learning techniques in recruitment to enhance the search strategy to ﬁnd candidates possessing the appropriate skills. Skill2vec is a neural network architecture inspired by Word2vec, developed by Mikolov et al. in 2013. It transforms skills to new vector space, which has the characteristics of calculation and presents skills relationships. We conducted an experiment evaluation manually by a recruitment company’s domain experts to demonstrate the effectiveness of our approach. </abstract>
+	<introduction>  </introduction>
+	<discussion>  </discussion>
+	<conclusion>  </conclusion>
+	<biblio> [1] Michael W Berry and Ricardo D Fierro. “Low-rank orthogonal decompositions for information retrieval applications”. In: Numerical linear algebra with applications 3.4 (1996), pp. 301–327. [2] Vinay Bhat et al. “Finding aliases on the web using latent semantic analysis”. In: Data & Knowledge Engineering 49.2 (2004), pp. 129–143. [3] Chien-Kang Huang, Lee-Feng Chien, and Yen-Jen Oyang. “Relevant term suggestion in interactive web search based on contextual information in query session logs”. In: Journal of the Association for Information Science and Technology 54.7 (2003), pp. 638–649. [4] Simon Hughes. How We Data-Mine Related Tech Skills . 2015. URL:http : / / insights . dice . com / 2015/03/16/how-we-data-mine-relatedtech-skills/ (visited on 09/12/2017). [5] Thorsten Lau and York Sure. “Introducing ontologybased skills management at a large insurance company”. In: Proceedings of the Modellierung . 2002, pp. 123–134. [6] Tomas Mikolov et al. “Efﬁcient Estimation of Word Representations in Vector Space”. In: CoRR abs/1301.3781 (2013). URL:http://dblp.unitrier.de/db/journals/corr/corr1301. html#abs-1301-3781 . [7] Christian Posse. Cloud Jobs API: machine learning goes to work on job search and discovery . 2016. URL: https : / / cloud . google . com / blog / big data/2016/11/cloud-jobs-api-machinelearning-goes-to-work-on-job-searchand-discovery (visited on 03/03/2018). </biblio>
+</article>

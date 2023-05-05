@@ -50,6 +50,16 @@ def transformAccent(line):
         "": {
             "e": "é"
         },
+        "":{
+           "":"fi" 
+        },
+        "":{
+            "":"ff"
+        },
+        "&":{
+            "":"&amp;amp;"
+        }
+        
 
     }
     for ac in accents:
@@ -100,7 +110,7 @@ def getTitle(metadata,text):
 def getBiblio(text):
     biblio=""
     # Use regular expressions to extract the author
-    biblio_regex = re.compile(r"References|REFERENCES\n((?:.|\n)*)")
+    biblio_regex = re.compile(r"References((?:.|\n)*)")
     biblio_match = re.findall(biblio_regex, text)
     biblio = biblio_match.pop() if biblio_match else ""
     return biblio.replace('-\n','').replace("\n"," ")
@@ -188,7 +198,7 @@ def getConclusion(text):
     """
     Extracts the conclusion of a scientific paper using a regex
     
-    conclu_regex = re.compile(r"[1-9IVX]*\.? Conclusions\s+((?:.|\n)*?)^[2-9]|II*\.?")
+    conclu_regex = re.compile(r"[1-9IVX]*\.? Conclusion\s+((?:.|\n)*?)^[2-9]|II*\.?")
     conclu_match = re.findall(conclu_regex, text)
     conclu = conclu_match.pop() if conclu_match else ""
     finalconclu=""
@@ -196,9 +206,9 @@ def getConclusion(text):
         finalconclu+=i
     
     """
-    conclu2_regex ="[1-9]\.? (Conclusions|Conclusion|CONCLUSION|C ONCLUSION)(s|S)?\s+((?:.|\n)*?)^[2-9]\.?"
+    conclu2_regex ="[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].?|References)"
     matches = re.finditer(conclu2_regex, text, re.MULTILINE)
-    finalconclu=""
+    finalconclu="N/A"
     for matchNum, match in enumerate(matches, start=1):
         
         #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
@@ -207,9 +217,21 @@ def getConclusion(text):
             groupNum = groupNum + 1
             if(groupNum==1):
                 finalconclu=match.group(groupNum)
+                print(finalconclu)
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
-    return finalconclu.replace('-\n','').replace('\n','') 
+    regex = r"[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].?|References)"
+
+    # Rechercher le texte correspondant à la regex
+    match = re.search(regex, text, re.MULTILINE|re.DOTALL)
+    conclufinal = "N/A"
+    # Vérifier si un résultat a été trouvé
+    if match:
+        # Afficher le texte extrait
+        conclufinal = match.group(2)
+    
+
+    return conclufinal.replace('-\n','').replace('\n','') 
 
 def getDiscussion(text):
     """
@@ -301,6 +323,7 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     """
     Writes all the capital information in a .xml file with an XML layout
     """
+   # print(text)
     outputXML = "<article>\n"
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
@@ -321,12 +344,12 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
         outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
         outputXML+="\t\t</auteur>\n"
     outputXML+="\t</auteurs>\n"
-    outputXML+="\t<abstract> "+getAbstract(pdf)+" </abstract>\n"
-    outputXML+="\t<introduction> "+getIntroduction(text)+" </introduction>\n"
-    outputXML+="\t<discussion> "+getDiscussion(text)+" </discussion>\n"
-    outputXML+="\t<conclusion> "+getConclusion(text)+" </conclusion>\n"
+    outputXML+="\t<abstract>"+getAbstract(pdf)+"</abstract>\n"
+    outputXML+="\t<introduction>"+getIntroduction(text)+"</introduction>\n"
+    outputXML+="\t<discussion>"+getDiscussion(text)+"</discussion>\n"
+    outputXML+="\t<conclusion>"+getConclusion(text)+"</conclusion>\n"
 
-    outputXML+="\t<biblio> "+getBiblio(text)+" </biblio>\n"
+    outputXML+="\t<biblio>"+getBiblio(text)+"</biblio>\n"
     
     outputXML+= "</article>"
     if(output_file_name!=""):

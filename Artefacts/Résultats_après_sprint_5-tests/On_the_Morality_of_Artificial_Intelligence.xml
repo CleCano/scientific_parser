@@ -1,0 +1,21 @@
+<article>
+	<preamble>On_the_Morality_of_Artificial_Intelligence.pdf</preamble>
+	<titre>On the Morality of Artiﬁcial Intelligence</titre>
+	<auteurs>
+		<auteur>
+			<nom>Alexandra Luccioni</nom>
+			<mail>N/A</mail>
+			<affiliation></affiliation>
+		</auteur>
+		<auteur>
+			<nom>Yoshua Bengio</nom>
+			<mail>N/A</mail>
+			<affiliation></affiliation>
+		</auteur>
+	</auteurs>
+	<abstract>  Much of the existing research on the social and ethical impact of Artiﬁcial Intelligence has been focused on deﬁning ethical principles and guidelines surrounding Machine Learning (ML) and other Artiﬁcial Intelligence (AI) algorithms [IEEE, 2017, Jobin et al., 2019]. While this is extremely useful for helping deﬁne the appropriate social norms of AI, we believe that it is equally important to discuss both the potential and risks of ML and to inspire the community to use ML for beneﬁcial objectives. In the present article, which is speciﬁcally aimed at ML practitioners, we thus focus more on the latter, carrying out an overview of existing high-level ethical frameworks and guidelines, but above all proposing both conceptual and practical principles and guidelines for ML research and deployment, insisting on concrete actions that can be taken by practitioners to pursue a more ethical and moral practice of ML aimed at using AI for social good. </abstract>
+	<introduction>  </introduction>
+	<discussion> within the scientiﬁc community and society at large. As some of us become more conscious of the potentialor deﬁnite social impact of ML, we have the opportunity, if not the duty, to make our voices heard. A goodexample of this is a recent letter signed by numerous scientists calling for an international treaty banninglethal autonomous weapon systems, e.g., killer drones which can decide to shoot at a person without humaninvolvement, which would make it possible to take the broad social, moral and psychological context intoaccount and potentially decide to abort the mission (for instance, when the target is in a school or at a familydinner surrounded by women and children).Finally, while the legal frameworks to oversee and limit research and development violating these principles are often and unfortunately updated in a reactive rather than a proactive manner, we believe thatwe should not wait until all of the dots between ML and ethics are formally connected by legislation andregulation. We believe that we have a responsibility to educate ourselves, to think ahead about potentialconsequences, to use our internal moral compasses and to consciously choose the direction of the researchor engineering that we practice. This is important because we believe that we are faced with a wisdomrace: as technology becomes more powerful, its impact can be proportionally greater, either positively ornegatively.To curb the negative impact, we need to become wiser individually (as reﬂected in our personal decisions) and collectively (through social norms, laws and regulations). Unfortunately, technological progressin AI has accelerated faster than the current rate of progress of personal and social wisdom, ultimately making it possible for unwise humans or organizations, even those with good intentions and acting legally, tohave large-scale, major destructive effects. This is comparable to a world in which nuclear bombs (i.e. verypowerful technology) were accessible and usable by children (i.e., persons with insufﬁcient maturity andwisdom), which could easily result in global nuclear war. This highlights the importance of the discussionsstill to be had by large numbers of ML practitioners about ethics and social impact, as well as the safeguardsthat need to be put in place to protect especially the most vulnerable members of our society. We will discuss some of the most advanced efforts to introduce these safeguards in the next section, followed by someexamples of socially beneﬁcial applications of ML. </discussion>
+	<conclusion> Conclusion </conclusion>
+	<biblio>  </biblio>
+</article>

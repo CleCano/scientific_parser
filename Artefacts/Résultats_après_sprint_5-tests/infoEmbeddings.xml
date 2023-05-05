@@ -1,0 +1,26 @@
+<article>
+	<preamble>infoEmbeddings.pdf</preamble>
+	<titre>An Empirical Evaluation of Text Representation Schemes on</titre>
+	<auteurs>
+		<auteur>
+			<nom>Multilingual Social</nom>
+			<mail>sjmodha@gmail.com</mail>
+			<affiliation></affiliation>
+		</auteur>
+		<auteur>
+			<nom>Web to Filter</nom>
+			<mail>prasenjit.majumder@gmail.comar</mail>
+			<affiliation></affiliation>
+		</auteur>
+		<auteur>
+			<nom>Textual Aggression</nom>
+			<mail>N/A</mail>
+			<affiliation></affiliation>
+		</auteur>
+	</auteurs>
+	<abstract>  </abstract>
+	<introduction> The Social Web is a great source for studying human interaction and behavior. Inthe last few years, there is an exponential growth in Social Media user base. Sensingcontent of Social Media like Facebook, Twitter, by the smart autonomous applicationempower its user community with real-time information which is unfolded across thedierent part of the world. Social media provide the easiest and anonymous platformfor common people to voice their opinion or view on a various entity like celebrity,politician, product, stock market etc or any social movement. Sometime such opinionsmight be aggressive in nature and propagate hate in the social media community.With the unprecedented increase in the user base of the social media and its availability on the Smartphones, incidents like Hate speech, trolling, Cyberbullying, andAggressive posts are increasing exponentially. A smart autonomous system is requiredwhich enable surveillance on the social media platform and detect such incidents.Some of the researchers look posts from the aspect like aggression Kumar Ritesh etal. (2018) to lter the contents. some of the posts contain words which might be qualied as either highly or overly aggressive or have hidden aggression. Sometimes postsdo not have any aggression. Based on these, posts or comments are categorized intothree classes namely: `Overtly Aggressive`, `Covertly Aggressiveànd `Non-aggressive`Kumar Ritesh et al. (2018). Henceforth, in the rest of the paper, we will denote theseclasses by these abbreviations namely: OAG, CAG, NAG respectively.Table 1 showsthe sample posts belonging to these classes.Social Media, specically Microblog has proved its importance during the disasterrelated incidents like an earthquake, Hurricane and oods1. Organizations involvedin relief operation actively track posts related to situational information posted onFacebook and Twitter during the disaster. However, At the same time, social mediais ooded with lots of prayer and condolence messages. Posts which contain factualinformation are extremely important for the organization involved in post-disasterrelief operations for coordination. Filtering and Ranking of the posts containing factualinformation will be very useful to them. We believe that this is the special problemof the Sentiment Analysis task. We consider this problem as a combination of twoclass classication problem: factual posts and nob-factual posts plus Ranking. Table </introduction>
+	<discussion> the future work in section 8. </discussion>
+	<conclusion> Conclusion </conclusion>
+	<biblio>  </biblio>
+</article>
