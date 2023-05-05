@@ -204,6 +204,9 @@ def getConclusion(text):
     finalconclu=""
     for i in conclu:
         finalconclu+=i
+
+
+        "(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)^(([2-9]?.?\s?References)|([2-9]?.?\s?(Acknowledgements|Acknowledgments)))"gm
     
     """
     conclu2_regex ="[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].?|References)"
@@ -220,8 +223,8 @@ def getConclusion(text):
                 print(finalconclu)
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
-    regex = r"[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].+ .*|References|Acknowledgements)"
-
+    #regex = r"[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].+ .*|References|Acknowledgements)"
+    regex = r"(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
     # Rechercher le texte correspondant à la regex
     match = re.search(regex, text, re.MULTILINE|re.DOTALL)
     conclufinal = "N/A"
