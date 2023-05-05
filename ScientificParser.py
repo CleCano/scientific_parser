@@ -239,12 +239,17 @@ def getConclusion(text):
     #regex = r"[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].+ .*|References|Acknowledgements)"
     regex = r"(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
     # Rechercher le texte correspondant à la regex
-    match = re.search(regex, text, re.MULTILINE|re.DOTALL)
-    conclufinal = "N/A"
+    
+    conclu_match = re.findall(regex, text)
+    conclu = conclu_match.pop() if conclu_match else "N/A"
+    conclufinal=""
+    for i in conclu:
+        conclufinal+=i
+    #conclufinal = "N/A"
     # Vérifier si un résultat a été trouvé
-    if match:
+    #if match:
         # Afficher le texte extrait
-        conclufinal = match.group(2)
+    #    conclufinal = match.group(2)
     
 
     return conclufinal.replace('-\n','').replace('\n','') 
