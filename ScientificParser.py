@@ -222,7 +222,7 @@ def getConclusion(text):
         "(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)^(([2-9]?.?\s?References)|([2-9]?.?\s?(Acknowledgements|Acknowledgments)))"gm
     
     """
-    conclu2_regex ="[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].?|References)"
+    conclu2_regex ="(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
     matches = re.finditer(conclu2_regex, text, re.MULTILINE)
     finalconclu="N/A"
     for matchNum, match in enumerate(matches, start=1):
@@ -237,19 +237,21 @@ def getConclusion(text):
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
     #regex = r"[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].+ .*|References|Acknowledgements)"
-    regex = r"(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+    regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
     # Rechercher le texte correspondant à la regex
-    
+    groups = re.compile(regex)
+    textIndex = groups.groupindex['text']
     conclu_match = re.findall(regex, text)
-    conclu = conclu_match.pop() if conclu_match else "N/A"
-    conclufinal=""
-    for i in conclu:
-        conclufinal+=i
-    #conclufinal = "N/A"
+    #conclu = conclu_match.pop() if conclu_match else "N/A"
+    #conclufinal=""
+    #for i in conclu:
+    #    conclufinal+=i
+    
+    conclufinal = "N/A"
     # Vérifier si un résultat a été trouvé
-    #if match:
+    if conclu_match:
         # Afficher le texte extrait
-    #    conclufinal = match.group(2)
+        conclufinal = match.group(textIndex)
     
 
     return conclufinal.replace('-\n','').replace('\n','') 
