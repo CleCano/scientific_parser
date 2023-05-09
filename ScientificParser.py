@@ -254,7 +254,7 @@ def getConclusion(text):
         conclufinal = match.group(textIndex)
     
 
-    return conclufinal.replace('-\n','').replace('\n','') 
+    return conclufinal.replace('\n','') 
 
 def getDiscussion(text):
     """
