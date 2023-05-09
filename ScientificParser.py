@@ -169,10 +169,10 @@ def getAuthors(metadata,text, title):
 
     return authors
 
-def getAbstract(pdf):
+def getAbstract(text):
     """
     Extracts the abstract from the PDF using multiple regex to achieve the highest accurency possible
-    """
+    
     text = pdf.pages[0].extract_text()
     abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
     abstract_match = re.findall(abstract_regex, text)
@@ -185,6 +185,34 @@ def getAbstract(pdf):
     for i in abstract:
         finalAbstract+=i
     return finalAbstract.replace('-\n','').replace("\n"," ")
+    """
+    regex = r"(?:([1-9]+?.?)|([IVX]*.))?(\s+)?(?:(Abstract)|(ABSTRACT)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(Introduction|INTRODUCTION))|Introduction\n)"
+    matches = re.finditer(regex, text, re.MULTILINE)
+    finalabstract="N/A"
+    for matchNum, match in enumerate(matches, start=1):
+        
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+ 
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            if(groupNum==1):
+                finalabstract=match.group(groupNum)
+
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+
+                    
+    # Rechercher le texte correspondant à la regex
+    groups = re.compile(regex)
+    textIndex = groups.groupindex['text']
+    abstract_match = re.findall(regex, text)
+    abstract = "N/A"
+    # Vérifier si un résultat a été trouvé
+    if abstract_match:
+        # Afficher le texte extrait
+        abstract = match.group(textIndex)
+    
+    print(abstract)
+    return abstract.replace('\n',' ')
 
 
 def getIntroduction(text):
@@ -222,38 +250,27 @@ def getConclusion(text):
         "(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)^(([2-9]?.?\s?References)|([2-9]?.?\s?(Acknowledgements|Acknowledgments)))"gm
     
     """
-    conclu2_regex ="(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
-    matches = re.finditer(conclu2_regex, text, re.MULTILINE)
+    regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+    matches = re.finditer(regex, text, re.MULTILINE)
     finalconclu="N/A"
     for matchNum, match in enumerate(matches, start=1):
-        
-        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
-        
+                
         for groupNum in range(0, len(match.groups())):
             groupNum = groupNum + 1
             if(groupNum==1):
                 finalconclu=match.group(groupNum)
-                print(finalconclu)
-            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
-    
-    #regex = r"[1-9].?\s+Conclusion(s)?\s+((?:.|\n)*?)^([2-9].+ .*|References|Acknowledgements)"
-    regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+                    
     # Rechercher le texte correspondant à la regex
     groups = re.compile(regex)
     textIndex = groups.groupindex['text']
     conclu_match = re.findall(regex, text)
-    #conclu = conclu_match.pop() if conclu_match else "N/A"
-    #conclufinal=""
-    #for i in conclu:
-    #    conclufinal+=i
-    
     conclufinal = "N/A"
     # Vérifier si un résultat a été trouvé
     if conclu_match:
         # Afficher le texte extrait
         conclufinal = match.group(textIndex)
     
-    print(conclufinal)
+    #print(conclufinal)
     return conclufinal.replace('\n',' ') 
 
 def getDiscussion(text):
@@ -330,7 +347,7 @@ def writeTxt(file_name,output_file_name,text,metadata,pdf):
     #auteurs = getAuthors(metadata,text).split(";")
     #emails = getAdresse(pdf)
 
-    outputString+="Résumé de l'article :\n"+getAbstract(pdf)+"\n"
+    outputString+="Résumé de l'article :\n"+getAbstract(text)+"\n"
     outputString+="Bibliographie : "+getBiblio(text)+"\n"
     if(output_file_name!=""):
         fd = os.open(output_file_name,flags=os.O_RDWR|os.O_CREAT|os.O_TRUNC)
@@ -367,7 +384,7 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
         outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
         outputXML+="\t\t</auteur>\n"
     outputXML+="\t</auteurs>\n"
-    outputXML+="\t<abstract>"+getAbstract(pdf)+"</abstract>\n"
+    outputXML+="\t<abstract>"+getAbstract(text)+"</abstract>\n"
     outputXML+="\t<introduction>"+getIntroduction(text)+"</introduction>\n"
     outputXML+="\t<discussion>"+getDiscussion(text)+"</discussion>\n"
     outputXML+="\t<conclusion>"+getConclusion(text)+"</conclusion>\n"
