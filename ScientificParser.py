@@ -253,8 +253,8 @@ def getConclusion(text):
         # Afficher le texte extrait
         conclufinal = match.group(textIndex)
     
-
-    return conclufinal.replace('\n','') 
+    print(conclufinal)
+    return conclufinal.replace('\n',' ') 
 
 def getDiscussion(text):
     """
