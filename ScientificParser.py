@@ -205,7 +205,7 @@ def getIntroduction(text):
     Extracts the introduction of a scientific paper using a regex
     """
 
-    intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+.))\s+?"
+    intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+?.*))\s+?"
     matches = re.finditer(intro2_regex, text, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         
