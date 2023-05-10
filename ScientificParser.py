@@ -123,7 +123,7 @@ def getTitle(metadata,text):
 def getBiblio(text):
     biblio=""
     # Use regular expressions to extract the author
-    biblio_regex = re.compile(r"(References|REFERENCES)((?:.|\n)*)")
+    biblio_regex = re.compile(r"(References|REFERENCES|Bibliographical References)((?:.|\n)*)")
     biblio_match = re.findall(biblio_regex, text)
     biblio = biblio_match.pop() if biblio_match else ""
     return biblio[1].replace('-\n','').replace("\n"," ")
@@ -205,7 +205,7 @@ def getIntroduction(text):
     Extracts the introduction of a scientific paper using a regex
     """
 
-    intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\s+.))\s+?"
+    intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+.))\s+?"
     matches = re.finditer(intro2_regex, text, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         
