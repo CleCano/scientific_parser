@@ -71,7 +71,7 @@ def transformAccent(line):
         "":{
             "":"*"
         },
-        "":{
+        "":{
             "":"*"
         }
     }
@@ -123,10 +123,10 @@ def getTitle(metadata,text):
 def getBiblio(text):
     biblio=""
     # Use regular expressions to extract the author
-    biblio_regex = re.compile(r"References((?:.|\n)*)")
+    biblio_regex = re.compile(r"(References|REFERENCES)((?:.|\n)*)")
     biblio_match = re.findall(biblio_regex, text)
     biblio = biblio_match.pop() if biblio_match else ""
-    return biblio.replace('-\n','').replace("\n"," ")
+    return biblio[1].replace('-\n','').replace("\n"," ")
 
 
 def getAdresses(pdf):
