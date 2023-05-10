@@ -271,7 +271,7 @@ def getDiscussion(text):
                 finaldiscu=match.group(groupNum)
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
-    return finaldiscu..replace('\n','')
+    return finaldiscu.replace('\n','')
 
 
 def extract_pdf_info(file_path):
