@@ -211,7 +211,7 @@ def getAbstract(text):
         # Afficher le texte extrait
         abstract = match.group(textIndex)
     
-    print(abstract)
+    #print(abstract)
     return abstract.replace('\n',' ')
 
 
@@ -250,15 +250,22 @@ def getConclusion(text):
         "(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)^(([2-9]?.?\s?References)|([2-9]?.?\s?(Acknowledgements|Acknowledgments)))"gm
     
     """
-    regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+    #regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+    #conclu2_regex ="(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+    regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?))(( and Future Work)|( and Further Work))?\n?(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
+    conclu2_regex=r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?))(( and Future Work)|( and Further Work))?\n?(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|References\n)"
     matches = re.finditer(regex, text, re.MULTILINE)
     finalconclu="N/A"
     for matchNum, match in enumerate(matches, start=1):
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
                 
         for groupNum in range(0, len(match.groups())):
             groupNum = groupNum + 1
             if(groupNum==1):
                 finalconclu=match.group(groupNum)
+            
+            print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+
                     
     # Rechercher le texte correspondant à la regex
     groups = re.compile(regex)
@@ -270,7 +277,7 @@ def getConclusion(text):
         # Afficher le texte extrait
         conclufinal = match.group(textIndex)
     
-    #print(conclufinal)
+    print(conclufinal)
     return conclufinal.replace('\n',' ') 
 
 def getDiscussion(text):
