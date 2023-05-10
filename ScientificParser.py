@@ -82,7 +82,7 @@ def transformAccent(line):
             line = line.replace(ac + letter, accents[ac][letter])
     return line
 
-def getTitle(metadata,text):
+def getTitle(metadata, text):
     title = None
     circlecopyrt = re.compile(r'.*circlecopyrt.*')
     if "/Title" in metadata and metadata["/Title"] != None and metadata["/Title"].rstrip() != "" and metadata["/Title"].count("/") <=2 and not circlecopyrt.search(metadata["/Title"]):
@@ -104,19 +104,35 @@ def getTitle(metadata,text):
                 break
             i += 1
         if (not cancel):
+            ligneToSkip = ['this article', 'copy is', 'and', 'other uses', 'licensing copies', 'websites are prohibited', 'in most case', 'article', 'institutional', 'regarding', 'encouraged to visit', 'http', 'author']
+            changed = True
+            while(changed):
+                changed = False
+                for a in ligneToSkip:
+                    if (ss[i].lower().startswith(a)):
+                        changed = True
+                        i = i+1
             title = ss[i]
+            #TODO A REFAIRE CA NE FONCTIONNE PAS
             startWithMinuscule = re.compile(r'(^[a-z]{1,}.*)')
             i += 1
             while(startWithMinuscule.match(ss[i])):
                 title += " " + ss[i]
                 i += 1
-            #Le mot qui suit le titre peut aussi comporter une Majuscule et c'est en majorité le cas
+            #Le mot qui suis le titre peut aussi comporter une Majuscule et c'est en majorité le cas
             #Cependant ces mots sont séparé souvent par des mots de liaisons 
             #Donc si nous en avons en fin de ligne, alors cela veut dire que la ligne suivante fait partie du titre
-            haveLisaisonWord = re.compile(r'.*(in|for|of|as|with|into|to|from)$')
+            haveLisaisonWord = re.compile(r'.* (in|for|of|as|with|into|to|from|at|a|on)$')
             while(haveLisaisonWord.match(title)):
                 title += " " + ss[i]
                 i += 1
+
+            # End with "the <adjective>"
+            adjectives = ['relevant', 'multi-sentence'] # Rajouter dans la liste les adjectives
+            for adj in adjectives:
+                if(title.lower().endswith(adj)):
+                    title += " " + ss[i]
+                    i += 1
     
     return title
 
@@ -148,26 +164,89 @@ def getAdresses(pdf):
 
 def getAuthors(metadata,text, title):
     authors = {}
-    # On sépare les lignes
-    ss = text.split("\n")
-    i = 0
-    # On commence par virer les lignes inutiles et le titre
-    found = False
-    while(not found or ss[i].split("\n")[0].strip() in title):
-        if ss[i].split("\n")[0].strip() in title or title in ss[i]:
-            found = True
-        i += 1
-    #premiere ligne avec les auteurs dedans :
-    #print("|", ss[i].strip(), "|")
-    # regex nom + prenom autheur : 
-    a = [x.group() for x in re.finditer( r'((([A-Z]([a-z]|é|á|è|ç|î)*)|[A-Z].)(( [a-z]* )|-| )([A-Z].[A-Z]. |[A-Z]. )?(([A-Z]|[a-z]|é|á|è|ç|î)*(-[A-Z]([a-z]|é|á|è|ç|î)*)?))', ss[i].strip())]
-    
-    i = 0
-    for b in a:
-        authors[i] = b
-        i +=1
+    if False:#(metadata.author!="" and metadata.author!="None" and metadata.author != None):
+        authors = metadata.author
+        print("aa ", authors)
+    else:
+        # On sépare les lignes
+        ss = text.split("\n")
+        i = 0
+        # On commence par virer les lignes inutiles et le titre
+        found = False
+        while(not found or ss[i].split("\n")[0].strip() in title):
+            if ss[i].split("\n")[0].strip() in title or title in ss[i]:
+                found = True
+            i += 1
+        # regex nom + prenom autheur : 
+        a = [x.group() for x in re.finditer( r'((([A-Z]([a-z]|é|á|è|ç|î)*)|[A-Z].)(( [a-z]* )|-| )([A-Z].[A-Z]. |[A-Z]. )?(([A-Z]|[a-z]|é|á|è|ç|î)*(-[A-Z]([a-z]|é|á|è|ç|î)*)?))', ss[i].strip())]
+        
+        # On récupère le numéro de ligne de début de l'abstract
+        origin_i = i    
+        abstract_regex = re.compile(r".*(Abstract|ABSTRACT|abstract|In this article|This article presents).*")
+        while( not abstract_regex.match(ss[origin_i])):
+            origin_i += 1
+        abstractLine = origin_i
 
-    return authors
+
+        print("\n")
+        print("\n")
+
+        authors = []
+        emails = []
+        affiliations = []
+
+        email_regex = re.compile(r"(([a-zA-Z0-9_.-]+, ){0,1}\({0,1}[a-zA-Z0-9_.,-]+\){0,1}[\n ]{0,2}(@|Q)[a-zA-Z0-9-.]+\.(\n|)[a-z-]+)") 
+        endofemail_regex = re.compile(r"((@|Q)[a-zA-Z0-9-.]+\.(\n|)[a-z-]+)")    
+        for line in range(i, abstractLine):
+            if email_regex.match(ss[line]):
+                e = re.match(email_regex, ss[line])
+                emails.append(e.group(0))
+            elif endofemail_regex.match(ss[line]) and email_regex.match(ss[line-1] + ss[line]): # Si la ligne match le @machin, ça veut dire que la ligne d'avant devrait aussi faire partie de l'email
+                e = re.match(email_regex, ss[line-1] + ss[line])
+                emails.append(e.group(0))
+
+        affiliation_regex = re.compile(r".*(Laboratoire|École|Institute|University|Université|([A-Z][a-z]* Inc\.)|Département|Department|Univ.|Research|Universitat|Insitut|DA-IICT).*")
+        for line in range(i, abstractLine):
+            #print(ss[line])
+            if affiliation_regex.match(ss[line]):
+                # si on trouve une ligne comme c'est le cas ici
+                # alors on va tout lire jusqu'a une email
+                affiliations.append(" NOUVELLE AFFILIATION : ")
+                affiliations.append(ss[line])
+                
+                abracadabra = line + 1
+                while(not email_regex.match(ss[abracadabra]) and abracadabra < abstractLine):
+                    affiliations.append(ss[abracadabra])
+                    abracadabra += 1
+                    
+                
+
+        author_regex = re.compile(r"((?:(?:[A-Z](?:[a-z]|é|á|è|ç|î)*)|[A-Z].)(?:(?: [a-z]* )|-| )(?:[A-Z].[A-Z]. |[A-Z]. )?(?:(?:[A-Z]|[a-z]|é|á|è|ç|î)*(?:-[A-Z](?:[a-z]|é|á|è|ç|î)*)?))")
+        date_regex = re.compile(r"(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)(\s+(\d{1,2}))?,?\s+(\d{4})")
+        for line in range(i, abstractLine):
+            #print(ss[line])
+            if author_regex.search(ss[line]):
+                #print("   OO")
+                e = re.findall(author_regex, ss[line])
+                isAffiliationOrDate = False
+                for a in affiliations:
+                    if(a ==ss[line]):
+                        isAffiliationOrDate = True
+                if re.match(date_regex, ss[line]):
+                    isAffiliationOrDate = True
+                if not isAffiliationOrDate:
+                    for b in e:
+                        authors.append(b)
+
+        # Récupérer la position de leture des auteurs(et l'exposant dans le cas ou il y en as), afin de les affecté au bonnes affiliation
+        
+        print("Titre : ", title)
+        print('Authors : ', authors)
+        print('Emails : ', emails)
+        print('Affiliations : ', affiliations)
+      
+    
+    return authors,emails,affiliations
 
 def getAbstract(text,file_name=""):
     """
@@ -229,11 +308,17 @@ def getIntroduction(text,file_name=""):
         intro = match.group(textIndex)
     return intro.replace('\n',' ')
 
-def getConclusion(text):
+def getConclusion(text,file_name=""):
     """
     Extracts the conclusion of a scientific paper using a regex
-    """
     regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?))(( and Future Work)|( and future work)|( and Further Work))?\n?(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|(References|REFERENCES)\n)"
+    
+    """
+
+    if(file_name=="surveyTermExtraction.pdf"):
+        regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?))(( and Future Work)|( and future work)|( and Further Work))?\n?(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|(References|REFERENCES)\n)"
+    else:
+        regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?))(( and Future Work)|( and future work)|( and Further Work))?\n?(?P<text>(?:.|\n)*?)(^(((([1-9]+?.?)|([IVX]*\..*))?\s+?)((References|REFERENCES)|((Acknowledgements|Acknowledgments|))))|(References|REFERENCES|Acknowledgements|Acknowledgments)\n)"
     matches = re.finditer(regex, text, re.MULTILINE)
     # Parcours de tous les groupes pour débug
     for matchNum, match in enumerate(matches, start=1):
@@ -350,29 +435,36 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>\n"
-    auteurs = getAuthors(metadata,text,getTitle(metadata,text))
-    emails = getAdresses(pdf)
-    line = [elem.strip().split('\t') for elem in emails]
-    vals = numpy.asarray(line) 
-    for i in auteurs:
+    auteurs,emails,affiliations = getAuthors(metadata,text,getTitle(metadata,text))
+    lineEmail = [elem.strip().split('\t') for elem in emails]
+    valsEmail = numpy.asarray(lineEmail)
+
+    lineAuteur = [elem.strip().split('\t') for elem in auteurs]
+    valsAuteur = numpy.asarray(lineAuteur)
+    
+
+
+    for i in range(len(valsAuteur)):
         outputXML+="\t\t<auteur>\n"
-        outputXML+="\t\t\t<nom>"+auteurs[i]+"</nom>\n"
+        outputXML+="\t\t\t<nom>"+valsAuteur[i][0]+"</nom>\n"
         outputXML+="\t\t\t<mail>"
-        if(i<vals.size and vals[i]!=None):
-            outputXML+=emails[i]
-        else:
+        try:
+            outputXML+=valsEmail[i][0]
+        except:
             outputXML+="N/A"
         outputXML+="</mail>\n"
         outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
         outputXML+="\t\t</auteur>\n"
+
     outputXML+="\t</auteurs>\n"
+    
     if(file_name=="IPM1481.pdf"):
         outputXML+="\t<abstract>"+getAbstract(pdf.pages[1].extract_text(),file_name)+"</abstract>\n"
     else:
         outputXML+="\t<abstract>"+getAbstract(text)+"</abstract>\n"
     outputXML+="\t<introduction>"+getIntroduction(text,file_name)+"</introduction>\n"
     outputXML+="\t<discussion>"+getDiscussion(text)+"</discussion>\n"
-    outputXML+="\t<conclusion>"+getConclusion(text)+"</conclusion>\n"
+    outputXML+="\t<conclusion>"+getConclusion(text,file_name)+"</conclusion>\n"
 
     outputXML+="\t<biblio>"+getBiblio(text)+"</biblio>\n"
     
