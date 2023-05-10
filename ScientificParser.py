@@ -169,7 +169,7 @@ def getAuthors(metadata,text, title):
 
     return authors
 
-def getAbstract(text):
+def getAbstract(text,file_name=""):
     """
     Extracts the abstract from the PDF using multiple regex to achieve the highest accurency possible
     
@@ -186,32 +186,36 @@ def getAbstract(text):
         finalAbstract+=i
     return finalAbstract.replace('-\n','').replace("\n"," ")
     """
-    regex = r"(?:([1-9]+?.?)|([IVX]*.))?(\s+)?(?:(Abstract)|(ABSTRACT)).*\n(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(Introduction|INTRODUCTION))|Introduction\n)"
+    print(text)
+    if(file_name=="IPM1481.pdf"):
+        regex=r"(?:([1-9]+?.?)|([IVX]*.))?(\s+)?(?:(Abstract)|(ABSTRACT)|abstract)((\s+)?—*\n?)(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(Introduction|INTRODUCTION|Artiﬁcial))|Introduction\n)"
+    else:
+        regex = r"(?:([1-9]+?.?)|([IVX]*.))?(\s+)?(?:(Abstract)|(ABSTRACT))((\s+)?—*\n?)(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(Introduction|INTRODUCTION|Artiﬁcial))|Introduction\n)"
     matches = re.finditer(regex, text, re.MULTILINE)
     finalabstract="N/A"
     for matchNum, match in enumerate(matches, start=1):
         
-        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+        print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
  
         for groupNum in range(0, len(match.groups())):
             groupNum = groupNum + 1
             if(groupNum==1):
                 finalabstract=match.group(groupNum)
 
-            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+            print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
 
                     
     # Rechercher le texte correspondant à la regex
     groups = re.compile(regex)
     textIndex = groups.groupindex['text']
-    abstract_match = re.findall(regex, text)
+    abstract_match = re.findall(regex, text,re.MULTILINE)
     abstract = "N/A"
     # Vérifier si un résultat a été trouvé
     if abstract_match:
         # Afficher le texte extrait
         abstract = match.group(textIndex)
     
-    #print(abstract)
+    print(abstract)
     return abstract.replace('\n',' ')
 
 
@@ -264,20 +268,20 @@ def getConclusion(text):
             if(groupNum==1):
                 finalconclu=match.group(groupNum)
             
-            print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
 
                     
     # Rechercher le texte correspondant à la regex
     groups = re.compile(regex)
     textIndex = groups.groupindex['text']
-    conclu_match = re.findall(regex, text)
+    conclu_match = re.findall(regex,text,re.MULTILINE)
     conclufinal = "N/A"
     # Vérifier si un résultat a été trouvé
     if conclu_match:
         # Afficher le texte extrait
         conclufinal = match.group(textIndex)
     
-    print(conclufinal)
+    #print(conclufinal)
     return conclufinal.replace('\n',' ') 
 
 def getDiscussion(text):
@@ -391,7 +395,10 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
         outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
         outputXML+="\t\t</auteur>\n"
     outputXML+="\t</auteurs>\n"
-    outputXML+="\t<abstract>"+getAbstract(text)+"</abstract>\n"
+    if(file_name=="IPM1481.pdf"):
+        outputXML+="\t<abstract>"+getAbstract(pdf.pages[1].extract_text(),file_name)+"</abstract>\n"
+    else:
+        outputXML+="\t<abstract>"+getAbstract(text)+"</abstract>\n"
     outputXML+="\t<introduction>"+getIntroduction(text)+"</introduction>\n"
     outputXML+="\t<discussion>"+getDiscussion(text)+"</discussion>\n"
     outputXML+="\t<conclusion>"+getConclusion(text)+"</conclusion>\n"
