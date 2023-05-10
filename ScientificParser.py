@@ -172,37 +172,20 @@ def getAuthors(metadata,text, title):
 def getAbstract(text,file_name=""):
     """
     Extracts the abstract from the PDF using multiple regex to achieve the highest accurency possible
-    
-    text = pdf.pages[0].extract_text()
-    abstract_regex = re.compile(r"Abstract ?.?\.? ?((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
-    abstract_match = re.findall(abstract_regex, text)
-    abstract = abstract_match.pop() if abstract_match else ""
-    if abstract == "":
-        abstract_regex = re.compile(r"(Abstract ?.?\.? ?)|(In this article|This article presents)((?:.|\n)*?)\n[1-9I]\.?\s+") # Abstract\.? ?((?:.|\n)*?)\n[1-9A-Z]\.?\s+(?:INTRODUCTION|Introduction)
-        abstract_match = re.findall(abstract_regex, text)
-        abstract = abstract_match.pop() if abstract_match else ""
-    finalAbstract=""
-    for i in abstract:
-        finalAbstract+=i
-    return finalAbstract.replace('-\n','').replace("\n"," ")
     """
-    print(text)
     if(file_name=="IPM1481.pdf"):
         regex=r"(?:([1-9]+?.?)|([IVX]*.))?(\s+)?(?:(Abstract)|(ABSTRACT)|abstract)((\s+)?—*\n?)(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(Introduction|INTRODUCTION|Artiﬁcial))|Introduction\n)"
     else:
         regex = r"(?:([1-9]+?.?)|([IVX]*.))?(\s+)?(?:(Abstract)|(ABSTRACT))((\s+)?—*\n?)(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(Introduction|INTRODUCTION|Artiﬁcial))|Introduction\n)"
     matches = re.finditer(regex, text, re.MULTILINE)
-    finalabstract="N/A"
+    # Parcours de tous les groupes pour débug
     for matchNum, match in enumerate(matches, start=1):
         
-        print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
  
         for groupNum in range(0, len(match.groups())):
             groupNum = groupNum + 1
-            if(groupNum==1):
-                finalabstract=match.group(groupNum)
-
-            print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
 
                     
     # Rechercher le texte correspondant à la regex
@@ -214,8 +197,6 @@ def getAbstract(text,file_name=""):
     if abstract_match:
         # Afficher le texte extrait
         abstract = match.group(textIndex)
-    
-    print(abstract)
     return abstract.replace('\n',' ')
 
 
@@ -224,47 +205,40 @@ def getIntroduction(text):
     Extracts the introduction of a scientific paper using a regex
     """
 
-    intro2_regex ="[1I]\.? Introduction ?(?:.* *)\n((?:.|\n)*?)^([2-9]|II|III|IV|V|VI|VII|VIII|IX|X)\.? "
+    intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\s+.))\s+?"
     matches = re.finditer(intro2_regex, text, re.MULTILINE)
-    finalIntro=""
     for matchNum, match in enumerate(matches, start=1):
         
         #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
         
         for groupNum in range(0, len(match.groups())):
             groupNum = groupNum + 1
-            if(groupNum==1):
-                finalIntro=match.group(groupNum)
+            
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
-    return finalIntro.replace('-\n','').replace('\n','')
+    # Rechercher le texte correspondant à la regex
+    groups = re.compile(intro2_regex)
+    textIndex = groups.groupindex['text']
+    intro_match = re.findall(intro2_regex, text,re.MULTILINE)
+    intro = "N/A"
+    # Vérifier si un résultat a été trouvé
+    if intro_match:
+        # Afficher le texte extrait
+        intro = match.group(textIndex)
+    return intro.replace('\n',' ')
 
 def getConclusion(text):
     """
     Extracts the conclusion of a scientific paper using a regex
-    
-    conclu_regex = re.compile(r"[1-9IVX]*\.? Conclusion\s+((?:.|\n)*?)^[2-9]|II*\.?")
-    conclu_match = re.findall(conclu_regex, text)
-    conclu = conclu_match.pop() if conclu_match else ""
-    finalconclu=""
-    for i in conclu:
-        finalconclu+=i
-
-
-        "(([1-9]+?.?)|([IVX]*.))?\s+?((Conclusion(s)?)|(CONCLUSION(S)?)).*\n((?:.|\n)*?)^(([2-9]?.?\s?References)|([2-9]?.?\s?(Acknowledgements|Acknowledgments)))"gm
-    
     """
     regex = r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Conclusion(s)?)|(CONCLUSION(S)?))(( and Future Work)|( and future work)|( and Further Work))?\n?(?P<text>(?:.|\n)*?)(^((([1-9]+?.?)|([IVX]*.))?\s+?(References|REFERENCES)|((Acknowledgements|Acknowledgments)))|(References|REFERENCES)\n)"
     matches = re.finditer(regex, text, re.MULTILINE)
-    finalconclu="N/A"
+    # Parcours de tous les groupes pour débug
     for matchNum, match in enumerate(matches, start=1):
         #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
                 
         for groupNum in range(0, len(match.groups())):
-            groupNum = groupNum + 1
-            if(groupNum==1):
-                finalconclu=match.group(groupNum)
-            
+            groupNum = groupNum + 1         
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
 
                     
@@ -277,8 +251,6 @@ def getConclusion(text):
     if conclu_match:
         # Afficher le texte extrait
         conclufinal = match.group(textIndex)
-    
-    #print(conclufinal)
     return conclufinal.replace('\n',' ') 
 
 def getDiscussion(text):
@@ -287,7 +259,8 @@ def getDiscussion(text):
     """
     discu2_regex ="[1-9]{0,2}\.? (?:Discussion|discussion) ?(?:.* *)\n((?:.|\n)*?)^(([2-9]{0,2}\.? )|References|Conclusion|REFERENCES)"
     matches = re.finditer(discu2_regex, text, re.MULTILINE)
-    finaldiscu=""
+    finaldiscu="N/A"
+    # Parcours de tous les groupes pour débug
     for matchNum, match in enumerate(matches, start=1):
         
         #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
@@ -298,7 +271,7 @@ def getDiscussion(text):
                 finaldiscu=match.group(groupNum)
             #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
     
-    return finaldiscu.replace('-\n','').replace('\n','')
+    return finaldiscu..replace('\n','')
 
 
 def extract_pdf_info(file_path):
@@ -371,7 +344,6 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     """
     Writes all the capital information in a .xml file with an XML layout
     """
-   # print(text)
     outputXML = "<article>\n"
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
@@ -414,7 +386,6 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
 
 def launchExtraction(args):
     argsList = vars(args)
-    #print(args)
     output_file_name = ""
     if(argsList['out']!=None) : 
             output_file_name = argsList['out']
