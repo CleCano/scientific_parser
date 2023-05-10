@@ -76,6 +76,8 @@ def on_select():
       if(fileIn!= ""):
          exeCommand(fileIn,boolTextXml)
 
+def close(event=0):
+    exit(0)
 
 """
 Création de l'interface graphique
@@ -132,6 +134,7 @@ button_save.pack(padx=10)
 window.bind('<Control-o>', file_open)
 window.bind('<Control-s>', file_save)
 window.bind('<Control-x>',clear)
+window.bind('<Escape>',close)
 # Démarrer l'interface graphique
 window.mainloop()
 
