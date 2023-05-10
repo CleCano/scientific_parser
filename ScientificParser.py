@@ -200,12 +200,14 @@ def getAbstract(text,file_name=""):
     return abstract.replace('\n',' ')
 
 
-def getIntroduction(text):
+def getIntroduction(text,file_name=""):
     """
     Extracts the introduction of a scientific paper using a regex
     """
-
-    intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+?.*))\s+?"
+    if(file_name=="b0e5c43edf116ce2909ae009cc27a1546f09.pdf"):
+        intro2_regex=r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)Background"
+    else:
+        intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+?.*))\s+?"
     matches = re.finditer(intro2_regex, text, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         
@@ -368,7 +370,7 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
         outputXML+="\t<abstract>"+getAbstract(pdf.pages[1].extract_text(),file_name)+"</abstract>\n"
     else:
         outputXML+="\t<abstract>"+getAbstract(text)+"</abstract>\n"
-    outputXML+="\t<introduction>"+getIntroduction(text)+"</introduction>\n"
+    outputXML+="\t<introduction>"+getIntroduction(text,file_name)+"</introduction>\n"
     outputXML+="\t<discussion>"+getDiscussion(text)+"</discussion>\n"
     outputXML+="\t<conclusion>"+getConclusion(text)+"</conclusion>\n"
 
