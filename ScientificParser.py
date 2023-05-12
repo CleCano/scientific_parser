@@ -196,7 +196,7 @@ def getAuthors(metadata,text, title):
         affiliations = []
 
         email_regex = re.compile(r"((?:[a-zA-Z0-9_.-]+, ){0,1}\(?:{0,1}[a-zA-Z0-9_., -]+\){0,1}[\n ]{0,2}(?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)") 
-        endofemail_regex = re.compile(r"((@|Q)[a-zA-Z0-9-.]+\.(\n|)[a-z-]+)")    
+        endofemail_regex = re.compile(r"((?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)")    
         for line in range(i, abstractLine):
             if email_regex.match(ss[line]):
                 #e = re.match(email_regex, ss[line])
@@ -262,10 +262,13 @@ def getAuthors(metadata,text, title):
 
     #On commence par reformatter la liste d'auteurs pour le moment c'est provisoir, le temps de trouver une solution a la regex
     new_authors = []
+    idx_already_taken = []
     for i in range(len(authors)):
         if authors[i].count(' ') == 0 and authors[i].count('-') >= 1 and len(authors) >= i+1 and authors[i+1].count(' ') == 0:
             new_authors.append(authors[i] + ' ' + authors[i + 1])
-        else:
+            idx_already_taken.append(i)
+            idx_already_taken.append(i+1)
+        elif i not in idx_already_taken:
             new_authors.append(authors[i])
     authors = new_authors
     # Truc juste au dessu est provisoire
@@ -288,18 +291,40 @@ def getAuthors(metadata,text, title):
                 newaff += 1
                 new_affiliations.append('')
     affiliations = new_affiliations
-    print(affiliations)
-    print("AFFILIATIONS NOMBRE : ", len(affiliations))
     #Truc juste au dessus permet le reformattage des affiliations
+
+    # Et ici on reformatte les emails   
+    endofemail_regex = re.compile(r"(?:.*)((?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)(?:.*)")  
+    new_emails = []
+
+    for e in emails:
+        if e.count(',') > 0:
+            extension_email = ''
+            if endofemail_regex.match(e):
+                extension_email = re.match(endofemail_regex, e).group(1)
+            # Dans le cas ou il y a une virgule, soit il suffit simplement de la supprimer, soit il faut séparer plusieurs emails
+            for s in e.replace(' ', '').split(','):
+                if not s.strip() == '':
+                    new_emails.append(s + extension_email)
+        else:
+            new_emails.append(e)
+    emails = new_emails
+
+    # Truc au dessus permet le reformattage des emails
 
     # On commence par mettre les noms et prenoms des auteurs dans la liste
     for a in authors:
         # Si le prochain dans la liste est seul, alors il se peut qu'il soit lié à un autre
-        all_back[a] = {"mail": "N/A", "affiliation": "N/A"}
+        all_back[a.strip()] = {"mail": "N/A", "affiliation": "N/A"}
     
     # On parcour ensuite les emails
-
-
+    if len(emails) == len(all_back):
+        # Alors y'a le meme nombre d'email que de mec donc on les affectes tout simplement
+        pos = 0
+        for a in all_back:
+            all_back[a]['mail'] = emails[pos].strip()
+            pos += 1
+    print("all_back : ", all_back)
 
     # On parcours enfin les affiliations
     # Si il n'y a qu'une affiliation alors il est probable qu'ils l'aient tous
@@ -307,11 +332,13 @@ def getAuthors(metadata,text, title):
         for a in all_back:
             all_back[a]['affiliation'] = affiliations[0]
     # S'il y a autant d'affiliations que de personnes, alors il suffit de les associer
-    if len(affiliations) == len(all_back):
+    elif len(affiliations) == len(all_back):
         pos=  0
         for a in all_back:
             all_back[a]['affiliation'] = affiliations[pos]
             pos += 1
+    else:
+        print("AFFILIATIONS NOMBRE : ", len(affiliations))
 
 
     return all_back#, emails, affiliations}
@@ -469,6 +496,7 @@ def convertPdfToText(file_path):
         for page_num in range(len(pdf.pages)):
             page = pdf.pages[page_num]
             text += transformAccent(page.extract_text())
+            
     return (text,metadata,pdf)
 
 def writeTxt(file_name,output_file_name,text,metadata,pdf):
