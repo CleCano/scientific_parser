@@ -182,7 +182,7 @@ def getAuthors(metadata,text, title):
         
         # On récupère le numéro de ligne de début de l'abstract
         origin_i = i    
-        abstract_regex = re.compile(r".*(Abstract|ABSTRACT|abstract|In this article|This article presents).*")
+        abstract_regex = re.compile(r".*(Abstract|ABSTRACT|abstract|In this article|This article presents|article info|ARTICLE HISTORY).*")
         while( not abstract_regex.match(ss[origin_i])):
             origin_i += 1
         abstractLine = origin_i
@@ -195,33 +195,38 @@ def getAuthors(metadata,text, title):
         emails = []
         affiliations = []
 
-        email_regex = re.compile(r"(([a-zA-Z0-9_.-]+, ){0,1}\({0,1}[a-zA-Z0-9_.,-]+\){0,1}[\n ]{0,2}(@|Q)[a-zA-Z0-9-.]+\.(\n|)[a-z-]+)") 
+        email_regex = re.compile(r"((?:[a-zA-Z0-9_.-]+, ){0,1}\(?:{0,1}[a-zA-Z0-9_., -]+\){0,1}[\n ]{0,2}(?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)") 
         endofemail_regex = re.compile(r"((@|Q)[a-zA-Z0-9-.]+\.(\n|)[a-z-]+)")    
         for line in range(i, abstractLine):
             if email_regex.match(ss[line]):
-                e = re.match(email_regex, ss[line])
-                emails.append(e.group(0))
+                #e = re.match(email_regex, ss[line])
+                #emails.append(e.group(0))
+                a = email_regex.findall(ss[line])
+                for b in a:
+                    #print(b)
+                    emails.append(b)
             elif endofemail_regex.match(ss[line]) and email_regex.match(ss[line-1] + ss[line]): # Si la ligne match le @machin, ça veut dire que la ligne d'avant devrait aussi faire partie de l'email
                 e = re.match(email_regex, ss[line-1] + ss[line])
                 emails.append(e.group(0))
 
-        affiliation_regex = re.compile(r".*(Laboratoire|École|Institute|University|Université|([A-Z][a-z]* Inc\.)|Département|Department|Univ.|Research|Universitat|Insitut|DA-IICT).*")
+        affiliation_regex = re.compile(r".*(Laboratoire|École|Institute|University|Université|([A-Z][a-z]* Inc\.)|Département|Department|Univ.|Research|Universitat|Insitut|DA-IICT|LIMSI-CNRS).*")
+        lines_read = []     #Permet d'éviter de reconsidérer une affiliation, comme une nouvelle affiliation
         for line in range(i, abstractLine):
             #print(ss[line])
-            if affiliation_regex.match(ss[line]):
-                # si on trouve une ligne comme c'est le cas ici
-                # alors on va tout lire jusqu'a une email
-                affiliations.append(" NOUVELLE AFFILIATION : ")
-                affiliations.append(ss[line])
-                
-                abracadabra = line + 1
-                while(not email_regex.match(ss[abracadabra]) and abracadabra < abstractLine):
-                    affiliations.append(ss[abracadabra])
-                    abracadabra += 1
-                    
-                
+            if line not in lines_read:
+                if affiliation_regex.match(ss[line]):
+                    # si on trouve une ligne comme c'est le cas ici
+                    # alors on va tout lire jusqu'a une email
+                    affiliations.append(" NOUVELLE AFFILIATION : ")
+                    affiliations.append(ss[line])
+                    lines_read.append(line)
+                    abracadabra = line + 1
+                    while(not email_regex.match(ss[abracadabra]) and abracadabra < abstractLine):
+                        lines_read.append(abracadabra)
+                        affiliations.append(ss[abracadabra])
+                        abracadabra += 1
 
-        author_regex = re.compile(r"((?:(?:[A-Z](?:[a-z]|é|á|è|ç|î)*)|[A-Z].)(?:(?: [a-z]* )|-| )(?:[A-Z].[A-Z]. |[A-Z]. )?(?:(?:[A-Z]|[a-z]|é|á|è|ç|î)*(?:-[A-Z](?:[a-z]|é|á|è|ç|î)*)?))")
+        author_regex = re.compile(r"((?:(?:[A-Z](?:[a-z]|é|á|è|ç|î|í|à)*)|[A-Z].)(?:(?: [a-z]* )|-| )(?:[A-Z].[A-Z]. |[A-Z]. )?(?:(?:[A-Z]|[a-z]|é|á|è|ç|î|í|à)*(?:-[A-Z](?:[a-z]|é|á|è|ç|î|í|à)*)?))[1-9;]{0,3}")
         date_regex = re.compile(r"(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)(\s+(\d{1,2}))?,?\s+(\d{4})")
         for line in range(i, abstractLine):
             #print(ss[line])
@@ -244,9 +249,72 @@ def getAuthors(metadata,text, title):
         print('Authors : ', authors)
         print('Emails : ', emails)
         print('Affiliations : ', affiliations)
+
+        # TODO Déjà première chose, couper les adresses mails, quand elles sont raccourcies
+        #       Pour les mettre ensembles, parcourir les autheurs dans l'ordre qui vont servir de clé a un nouveau dictionnaire
+        #       Ensuite regarder avec une regex si dans leur nom se trouve à la fin une lettre ou un chiffre
+        #       Celle-ci permet d'obtenir l'affiliation correspondante, et donc l'affecter
+        #       Sinon affecter dans l'ordre des affiliations si il ya le mm nombre d'auteurs que d'emails
+        #       Et s'il n'y a qu'une affiliation, alors les mettre pour tous
+        #       Pour email, suffit de regarder si ça matche le nom, sinon affecter dans l'ordre
       
+    all_back = {}
+
+    #On commence par reformatter la liste d'auteurs pour le moment c'est provisoir, le temps de trouver une solution a la regex
+    new_authors = []
+    for i in range(len(authors)):
+        if authors[i].count(' ') == 0 and authors[i].count('-') >= 1 and len(authors) >= i+1 and authors[i+1].count(' ') == 0:
+            new_authors.append(authors[i] + ' ' + authors[i + 1])
+        else:
+            new_authors.append(authors[i])
+    authors = new_authors
+    # Truc juste au dessu est provisoire
+
+    # Ici on reformatte les affiliations 
+    new_affiliations = []
+    newaff = -1
+    for i in range(len(affiliations)):
+        if affiliations[i].startswith(' NOUVELLE AFFILIATION : '):
+            newaff += 1
+            new_affiliations.append('')
+        else:
+            # Si l'affiliations possède une date, alors on la retire
+            if date_regex.match(affiliations[i]):
+                affiliations[i] = re.sub(date_regex, '', affiliations[i])
+            # On ajoute l'affiliation
+            new_affiliations[newaff] = new_affiliations[newaff] + affiliations[i]
+            # on l'ajoute à la suite, sauf si cela commence par une minuscule colé à une majuscule, alors on sépare
+            if len(affiliations) > i+1 and re.search( r'^[a-z†∗1-9][A-ZÉ]', affiliations[i+1]):
+                newaff += 1
+                new_affiliations.append('')
+    affiliations = new_affiliations
+    print(affiliations)
+    print("AFFILIATIONS NOMBRE : ", len(affiliations))
+    #Truc juste au dessus permet le reformattage des affiliations
+
+    # On commence par mettre les noms et prenoms des auteurs dans la liste
+    for a in authors:
+        # Si le prochain dans la liste est seul, alors il se peut qu'il soit lié à un autre
+        all_back[a] = {"mail": "N/A", "affiliation": "N/A"}
     
-    return authors,emails,affiliations
+    # On parcour ensuite les emails
+
+
+
+    # On parcours enfin les affiliations
+    # Si il n'y a qu'une affiliation alors il est probable qu'ils l'aient tous
+    if len(affiliations) == 1:
+        for a in all_back:
+            all_back[a]['affiliation'] = affiliations[0]
+    # S'il y a autant d'affiliations que de personnes, alors il suffit de les associer
+    if len(affiliations) == len(all_back):
+        pos=  0
+        for a in all_back:
+            all_back[a]['affiliation'] = affiliations[pos]
+            pos += 1
+
+
+    return all_back#, emails, affiliations}
 
 def getAbstract(text,file_name=""):
     """
@@ -435,29 +503,20 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML+="\t<preamble>"+file_name+"</preamble>\n"
     outputXML+="\t<titre>"+getTitle(metadata,text)+"</titre>\n"
     outputXML+="\t<auteurs>\n"
-    auteurs,emails,affiliations = getAuthors(metadata,text,getTitle(metadata,text))
-    lineEmail = [elem.strip().split('\t') for elem in emails]
-    valsEmail = numpy.asarray(lineEmail)
-
-    lineAuteur = [elem.strip().split('\t') for elem in auteurs]
-    valsAuteur = numpy.asarray(lineAuteur)
-    
-
-
-    for i in range(len(valsAuteur)):
+    auteursInfo = getAuthors(metadata,text,getTitle(metadata,text))
+    print(auteursInfo)
+    for i in auteursInfo:
+        print(i)
+        print(auteursInfo[i]['mail'])
+        print(auteursInfo[i]['affiliation'])  
         outputXML+="\t\t<auteur>\n"
-        outputXML+="\t\t\t<nom>"+valsAuteur[i][0]+"</nom>\n"
+        outputXML+="\t\t\t<nom>"+i+"</nom>\n"
         outputXML+="\t\t\t<mail>"
-        try:
-            outputXML+=valsEmail[i][0]
-        except:
-            outputXML+="N/A"
+        outputXML+=auteursInfo[i]['mail']
         outputXML+="</mail>\n"
-        outputXML+="\t\t\t<affiliation>"+"</affiliation>\n"
+        outputXML+="\t\t\t<affiliation>"+auteursInfo[i]['affiliation']+"</affiliation>\n"
         outputXML+="\t\t</auteur>\n"
-
     outputXML+="\t</auteurs>\n"
-    
     if(file_name=="IPM1481.pdf"):
         outputXML+="\t<abstract>"+getAbstract(pdf.pages[1].extract_text(),file_name)+"</abstract>\n"
     else:
