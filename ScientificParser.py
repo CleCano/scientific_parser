@@ -73,7 +73,11 @@ def transformAccent(line):
         },
         "":{
             "":"*"
+        },
+        "":{
+            "":""
         }
+
     }
     for ac in accents:
         for letter in accents[ac]:
@@ -285,7 +289,7 @@ def getAuthors(metadata,text, title):
             if date_regex.match(affiliations[i]):
                 affiliations[i] = re.sub(date_regex, '', affiliations[i])
             # On ajoute l'affiliation
-            new_affiliations[newaff] = new_affiliations[newaff] + affiliations[i]
+            new_affiliations[newaff] = new_affiliations[newaff]+ " " + affiliations[i]
             # on l'ajoute à la suite, sauf si cela commence par une minuscule colé à une majuscule, alors on sépare
             if len(affiliations) > i+1 and re.search( r'^[a-z†∗1-9][A-ZÉ]', affiliations[i+1]):
                 newaff += 1
@@ -397,12 +401,14 @@ def getIntroduction(text,file_name=""):
     textIndex = groups.groupindex['text']
     pointIndex = groups.groupindex['point']
     point2Index = groups.groupindex['point2']
-    if(match.group(pointIndex)=="." or match.group(point2Index)==".") :
-        print("Version point obligatoire")
-        intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?\.)|([IVX]+\.))\s+?"
-    else:
-        intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?)|([IVX]+\s+?.*))\s+?"
-    matches = re.finditer(intro2_regex, text, re.MULTILINE)
+    intro_match = re.findall(intro2_regex, text,re.MULTILINE)
+    if(intro_match):
+        if(match.group(pointIndex)=="." or match.group(point2Index)==".") :
+            print("Version point obligatoire")
+            intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?\.)|([IVX]+\.))\s+?"
+        else:
+            intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?)|([IVX]+\s+?.*))\s+?"
+        matches = re.finditer(intro2_regex, text, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         
         #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
@@ -414,7 +420,7 @@ def getIntroduction(text,file_name=""):
     
     
     intro_match = re.findall(intro2_regex, text,re.MULTILINE)
-    intro = "N/A"
+    intro = " "
     # Vérifier si un résultat a été trouvé
     if intro_match:
         # Afficher le texte extrait
@@ -557,7 +563,7 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
         print(auteursInfo[i]['mail'])
         print(auteursInfo[i]['affiliation'])  
         outputXML+="\t\t<auteur>\n"
-        outputXML+="\t\t\t<nom>"+i+"</nom>\n"
+        outputXML+="\t\t\t<name>"+i+"</name>\n"
         outputXML+="\t\t\t<mail>"
         outputXML+=auteursInfo[i]['mail']
         outputXML+="</mail>\n"
