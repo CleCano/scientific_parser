@@ -379,9 +379,9 @@ def getIntroduction(text,file_name=""):
     Extracts the introduction of a scientific paper using a regex
     """
     if(file_name=="b0e5c43edf116ce2909ae009cc27a1546f09.pdf"):
-        intro2_regex=r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)Background"
+        intro2_regex=r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)Background"
     else:
-        intro2_regex =r"(?:([1-9]+?.?)|([IVX]*.))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+?.*))\s+?"
+        intro2_regex =r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?.?)|([IVX]+\.?\s+?.*))\s+?"
     matches = re.finditer(intro2_regex, text, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         
@@ -395,6 +395,13 @@ def getIntroduction(text,file_name=""):
     # Rechercher le texte correspondant à la regex
     groups = re.compile(intro2_regex)
     textIndex = groups.groupindex['text']
+    pointIndex = groups.groupindex['point']
+    print((match.group(pointIndex)==""))
+    point2Index = groups.groupindex['point2']
+    if(match.group(pointIndex)=="." or match.group(point2Index)==".") :
+        intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?\.)|([IVX]+\.\s+?.*))\s+?"
+    else:
+        intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?)|([IVX]+\s+?.*))\s+?"
     intro_match = re.findall(intro2_regex, text,re.MULTILINE)
     intro = "N/A"
     # Vérifier si un résultat a été trouvé
