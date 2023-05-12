@@ -396,18 +396,30 @@ def getIntroduction(text,file_name=""):
     groups = re.compile(intro2_regex)
     textIndex = groups.groupindex['text']
     pointIndex = groups.groupindex['point']
-    print((match.group(pointIndex)==""))
     point2Index = groups.groupindex['point2']
     if(match.group(pointIndex)=="." or match.group(point2Index)==".") :
-        intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?\.)|([IVX]+\.\s+?.*))\s+?"
+        print("Version point obligatoire")
+        intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?\.)|([IVX]+\.))\s+?"
     else:
         intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?)|([IVX]+\s+?.*))\s+?"
+    matches = re.finditer(intro2_regex, text, re.MULTILINE)
+    for matchNum, match in enumerate(matches, start=1):
+        
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+        
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+    
+    
     intro_match = re.findall(intro2_regex, text,re.MULTILINE)
     intro = "N/A"
     # Vérifier si un résultat a été trouvé
     if intro_match:
         # Afficher le texte extrait
         intro = match.group(textIndex)
+    print(intro)
     return intro.replace('\n',' ')
 
 def getConclusion(text,file_name=""):
