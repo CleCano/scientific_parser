@@ -140,13 +140,36 @@ def getTitle(metadata, text):
     
     return title
 
-def getBiblio(text):
+def getBiblio(text,file_name=""):
     biblio=""
     # Use regular expressions to extract the author
-    biblio_regex = re.compile(r"(References|REFERENCES|Bibliographical References)((?:.|\n)*)")
-    biblio_match = re.findall(biblio_regex, text)
-    biblio = biblio_match.pop() if biblio_match else ""
-    return biblio[1].replace('-\n','').replace("\n"," ")
+    if(file_name=="L18-1504.pdf"):
+        regex=r"(?:([1-9]+?.?)|([IVX]+.))(\s+)(References|REFERENCES|Bibliographical References)\n?(?P<text>(?:.|\n)*)"
+    else:
+        regex=r"(References|REFERENCES|Bibliographical References)(?P<text>(?:.|\n)*)"
+    
+    matches = re.finditer(regex, text, re.MULTILINE)
+    # Parcours de tous les groupes pour débug
+    for matchNum, match in enumerate(matches, start=1):
+        
+        #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+ 
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            #print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+
+                    
+    # Rechercher le texte correspondant à la regex
+    groups = re.compile(regex)
+    textIndex = groups.groupindex['text']
+    biblio_match = re.findall(regex, text,re.MULTILINE)
+    biblio = "N/A"
+    # Vérifier si un résultat a été trouvé
+    if biblio_match:
+        # Afficher le texte extrait
+        biblio = match.group(textIndex)
+    return biblio.replace('\n',' ')
+    
 
 
 def getAdresses(pdf):
@@ -425,7 +448,7 @@ def getIntroduction(text,file_name=""):
     if intro_match:
         # Afficher le texte extrait
         intro = match.group(textIndex)
-    print(intro)
+    #print(intro)
     return intro.replace('\n',' ')
 
 def getConclusion(text,file_name=""):
@@ -578,7 +601,7 @@ def writeXML(file_name,output_file_name,text,metadata,pdf):
     outputXML+="\t<discussion>"+getDiscussion(text)+"</discussion>\n"
     outputXML+="\t<conclusion>"+getConclusion(text,file_name)+"</conclusion>\n"
 
-    outputXML+="\t<biblio>"+getBiblio(text)+"</biblio>\n"
+    outputXML+="\t<biblio>"+getBiblio(text,file_name)+"</biblio>\n"
     
     outputXML+= "</article>"
     if(output_file_name!=""):
