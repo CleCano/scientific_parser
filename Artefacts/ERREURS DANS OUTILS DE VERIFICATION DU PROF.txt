@@ -1,0 +1,76 @@
+	Ce Document liste une partie des erreurs trouvées sur "Comparateur de fichier de resultat du Parser d'articles scientifiques (TEST)"
+
+
+
+- acl2012.xml :
+• Manque accent dans nom d'auteur : 'Caroline Hagège'
+
+b0e5c43edf116ce2909ae009cc27a1546f09.xml :
+
+
+- BLESS.xml :
+• Il manque le ',Italy' dans affiliation du deuxieme auteur
+
+- C14-1212.xml :
+
+
+- Guy.xml :
+
+
+- infoEmbeddings.xml :
+
+
+- IPM1481.xml :
+• Il manque les accents dans les noms d'auteurs et certaines majuscules (Bons noms: 'Rémy Kessler', 'Nicolas Béchet')
+
+- L18-1504.xml :
+• Il n'y as pas de '-' dans le premier auteur (Bon bom : 'Elvys Linhares Pontes')
+• Nom du second auteur incomplet (Bon nom: 'Juan-Manuel Torres-Moreno')
+• Nom du quatrième auteur incompltet (Bon nom: 'Andréa Carneiro Linhares')
+
+- On_the_Morality_of_Artificial_Intelligence.xml :
+
+
+- surveyTermExtraction.xml :
+• Ordre des auteurs mauvais (Premier inversé avec le second)
+• Noms d'auteurs incomplets (Dans l'ordre : 'M. Teresa Cabré Castellví', 'Rosa Estopà Bagot', 'Jordi Vivaldi Palatresi')
+• Affiliations de chaque auteur incomplète (Il manque 'La Rambla, 30-32 Barcelona – Spain - 08002' dans les affiliations)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
