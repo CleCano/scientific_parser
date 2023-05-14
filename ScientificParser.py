@@ -649,7 +649,7 @@ def convertPdfToText(file_path):
         for page_num in range(len(pdf.pages)):
             page = pdf.pages[page_num]
             text += transformAccent(page.extract_text())
-            
+    print(text)
     return (text,metadata,pdf)
 
 def writeTxt(file_name,output_file_name,text,metadata,pdf):
