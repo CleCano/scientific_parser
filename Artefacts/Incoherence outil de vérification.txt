@@ -1,4 +1,4 @@
-	Ce Document liste une partie des erreurs trouvées sur "Comparateur de fichier de resultat du Parser d'articles scientifiques (TEST)"
+	Ce Document liste une partie des incohérence trouvées sur "Comparateur de fichier de resultat du Parser d'articles scientifiques (TEST)" entre les fichiers de références et les informations dans le pdf
 
 
 
