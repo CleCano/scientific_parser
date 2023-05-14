@@ -50,4 +50,12 @@
 `pip3 install customtkinter`
 
 ---
-##
+## Résultats :
+
+Vous pourrez retrouver un compte rendu de notre projet dans le fichier :
+
+`Python Parser to Extract Information from Scientific Paper.pdf`
+
+Ainsi que tous nos résultats dans les Artefacts dans le fichier :
+
+`IUTEAM_SCIENTIFIC_PARSER_RESULTAT.xlsx`
