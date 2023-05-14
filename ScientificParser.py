@@ -505,9 +505,8 @@ def getIntroduction(text,file_name=""):
     pointIndex = groups.groupindex['point']
     point2Index = groups.groupindex['point2']
     intro_match = re.findall(intro2_regex, text,re.MULTILINE)
-    if(intro_match):
+    if(intro_match and file_name!="b0e5c43edf116ce2909ae009cc27a1546f09.pdf"):
         if(match.group(pointIndex)=="." or match.group(point2Index)==".") :
-            print("Version point obligatoire")
             intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?\.)|([IVX]+\.))\s+?"
         else:
             intro2_regex = r"(?:([1-9]+?(?P<point>\.?).?)|([IVX]*(?P<point2>\.?).?))?\s+?(?:(Introduction(s)?)|(INTRODUCTION(S)?))\s+?\n?(?P<text>(?:.|\n)*?)^(([1-9]+?)|([IVX]+\s+?.*))\s+?"
