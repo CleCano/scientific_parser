@@ -217,8 +217,8 @@ def getAuthors(metadata,text, title):
         abstractLine = origin_i
 
 
-        print("\n")
-        print("\n")
+        #print("\n")
+        #print("\n")
 
         authors = []
         emails = []
@@ -316,6 +316,7 @@ def getAuthors(metadata,text, title):
             new_authors.append(authors[i])
     authors = new_authors
     # Truc juste au dessu est provisoire
+    #print(authors)
 
     # Ici on reformatte les affiliations 
     new_affiliations = []
@@ -341,6 +342,30 @@ def getAuthors(metadata,text, title):
     affiliations = new_affiliations
     #Truc juste au dessus permet le reformattage des affiliations
     
+    # Avant de reformatter les emails, on regarde si notre liste d'emails et vide, et si c'est le cas, alors on va chercher dans tout le document
+    if len(emails) == 0:
+        email_regex = re.compile(r"((?:[a-zA-Z0-9_.-]+, ){0,1}\(?:{0,1}[a-zA-Z0-9_., -]+\){0,1}[\n ]{0,2}(?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)") 
+        endofemail_regex = re.compile(r"((?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)")    
+        for line in range(i, len(ss)):
+            #print(ss[line])
+            txttosearch = ss[line]
+            if (ss[line - 1].endswith("-")) and line < len(ss) - 2:
+                if len(ss[line-1].rsplit(" ", 1)) == 2:
+                    #print("MAIS cest qUOI LE PB ", ss[line-1].rsplit(" ", 1)[1] + ss[line])
+                    txttosearch = ss[line-1].rsplit(" ", 1)[1].rsplit("-", 1)[0] + ss[line]
+            if email_regex.search(txttosearch):
+                #e = re.match(email_regex, ss[line])
+                #emails.append(e.group(0))
+                a = email_regex.findall(txttosearch)
+                for b in a:
+                    #print(b)
+                    emails.append(b)
+                    #print(b)
+            elif endofemail_regex.match(ss[line]) and email_regex.match(ss[line-1] + ss[line]): # Si la ligne match le @machin, ça veut dire que la ligne d'avant devrait aussi faire partie de l'email
+                e = re.match(email_regex, ss[line-1] + ss[line])
+                emails.append(e.group(0))
+        #print("OHHHHHHHHHHHHHHHh : ", emails)
+
     # Et ici on reformatte les emails   
     endofemail_regex = re.compile(r"(?:.*)((?:@|Q)[a-zA-Z0-9-.]+\.(?:\n|)[a-z-]+)(?:.*)")  
     new_emails = []
@@ -363,7 +388,7 @@ def getAuthors(metadata,text, title):
     # On commence par mettre les noms et prenoms des auteurs dans la liste
     for a in authors:
         # Si le prochain dans la liste est seul, alors il se peut qu'il soit lié à un autre
-        all_back[a.strip()] = {"mail": "N/A", "affiliation": "N/A"}
+        all_back[a.strip()] = {"mail": "", "affiliation": ""}
     
     # On parcour ensuite les emails
     if len(emails) == len(all_back):
@@ -399,11 +424,12 @@ def getAuthors(metadata,text, title):
             if re.match(regex_exposant, a): #TODO IL NE COMPREND PAS ICI
                 #print("OHHHHHH ", re.match(regex_exposant, a).group(2), " ", re.match(regex_exposant, a).group(1))
                 affiliation_lettre = []
-                auteur_sans_expo = re.match(regex_exposant, a).group(1)
+                auteur_sans_expo = a #re.match(regex_exposant, a).group(1)
+                print(auteur_sans_expo)
                 for z in re.match(regex_exposants_only, a).groups():
                     if not z == None:
                         affiliation_lettre.append(z)
-                        auteur_sans_expo = auteur_sans_expo.split(z)[0]
+                        auteur_sans_expo = auteur_sans_expo.rsplit(z, 1)[0]
                 #print("AFFILIATION LETTRE : ", affiliation_lettre)
                 liste.append({"auteur": auteur_sans_expo, "affiliation_lettre": affiliation_lettre}) #"""re.match(regex_exposant, a).group(2)"""
         # Maintenant on va compter combien de lettre unique il y a 
@@ -413,7 +439,7 @@ def getAuthors(metadata,text, title):
                 unique_affiliation_lettre.add(a)
             #unique_affiliation_lettre.add(l["affiliation_lettre"])
         #print(unique_affiliation_lettre)
-
+        #print(authors)
         # Maintenant on sait combien de lettre unique il y a, et ont regarde s'il y a la même quantité d'affiliations
         if len(unique_affiliation_lettre) == len(affiliations):
             # S'il y a la meme quantité, alors on les associes mais pour cela, il faut récupérer la lettre d'affiliation
@@ -439,7 +465,7 @@ def getAuthors(metadata,text, title):
                         all_back[l["auteur"]]["affiliation"] = dictionnaire[a]
                         first = False
                     else:
-                        all_back[l["auteur"]]["affiliation"] = all_back[l["auteur"]]["affiliation"] + ", " + dictionnaire[a]
+                        all_back[l["auteur"]]["affiliation"] = all_back[l["auteur"]]["affiliation"] + " " + dictionnaire[a] #A la base je mettait ', ' pour séparé mais on change par ' ' comme c'est ce que le prof fait ...
                 #all_back[l["auteur"]]["affiliation"] = dictionnaire[l["affiliation_lettre"]]
 
         #print("AFFILIATIONS NOMBRE : ", len(affiliations))
